@@ -1,0 +1,16 @@
+export const laVeladaParticipants: string[] = [
+  "peereira",
+  "rivaldios",
+  "perxitaa",
+  "gaspi",
+  "abby",
+  "roro",
+  "andoni",
+  "carlos",
+  "alana",
+  "arigeli",
+  "viruzz",
+  "tomas",
+  "grefg",
+  "westcol",
+];
