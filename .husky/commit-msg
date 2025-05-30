@@ -1,16 +1,31 @@
 #!/bin/sh
-# Check commit message format
-commit_regex='^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .{1,50}'
+# Check commit message format according to Conventional Commits v1.0.0
+# https://www.conventionalcommits.org/en/v1.0.0/
+commit_regex='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9]+(-[a-z0-9]+)*\))?(!)?:\s.{1,}$'
 
 # Allow merge commits
 if grep -qE '^Merge' "$1"; then
     exit 0
 fi
 
+# Allow revert commits
+if grep -qE '^Revert' "$1"; then
+    exit 0
+fi
+
 if ! grep -qE "$commit_regex" "$1"; then
     echo "Invalid commit message format!"
-    echo "Commit message should start with one of: feat, fix, docs, style, refactor, test, chore"
+    echo "Commit message must follow Conventional Commits specification:"
     echo "Format: type(scope): description"
-    echo "Example: feat(auth): add user login functionality"
+    echo ""
+    echo "Available types: build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test"
+    echo "Optional scope: (api), (ui), (auth), etc."
+    echo "Optional breaking change: ! after scope"
+    echo ""
+    echo "Examples:"
+    echo "  feat: add user authentication"
+    echo "  fix(api): resolve login endpoint error"
+    echo "  feat(auth)!: change authentication method"
+    echo "  docs: update installation guide"
     exit 1
 fi
