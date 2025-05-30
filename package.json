@@ -17,7 +17,7 @@
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx,astro}": ["biome check --write"],
-    "*.{json,md}": ["biome format --write"]
+    "*.{json,jsonc,css}": ["biome format --write"]
   },
   "dependencies": {
     "@astrojs/react": "^4.2.1",
