@@ -1,0 +1,16 @@
+#!/bin/sh
+# Check commit message format
+commit_regex='^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .{1,50}'
+
+# Allow merge commits
+if grep -qE '^Merge' "$1"; then
+    exit 0
+fi
+
+if ! grep -qE "$commit_regex" "$1"; then
+    echo "Invalid commit message format!"
+    echo "Commit message should start with one of: feat, fix, docs, style, refactor, test, chore"
+    echo "Format: type(scope): description"
+    echo "Example: feat(auth): add user login functionality"
+    exit 1
+fi
