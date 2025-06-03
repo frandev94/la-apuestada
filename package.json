@@ -4,7 +4,7 @@
   "version": "0.0.2",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build --remote",
     "preview": "astro preview",
     "lint": "biome check",
     "lint:fix": "biome check --write",
@@ -14,6 +14,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ci": "vitest run --coverage",
+    "test:api": "vitest run test/api/",
+    "test:unit": "vitest run test/unit/",
+    "test:integration": "vitest run test/integration/",
+    "test:utils": "vitest run test/utils/",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
     "prepare": "husky",
     "lint-staged": "lint-staged",
     "release": "commit-and-tag-version",
@@ -22,12 +28,14 @@
     "release:patch": "commit-and-tag-version --release-as patch"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx,astro,json,jsonc,css,md}": [
-      "biome check --write", "astro check"
+    "*.{js,ts,jsx,tsx,astro,json,jsonc,css}": [
+      "biome check --write",
+      "astro check"
     ]
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
+    "@astrojs/db": "^0.15.0",
     "@astrojs/react": "^4.3.0",
     "@astrojs/vercel": "^8.1.4",
     "astro": "^5.8.1",

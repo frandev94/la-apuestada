@@ -1,5 +1,9 @@
 name: CI/CD Pipeline
 
+env:
+  ASTRO_DATABASE_FILE: ./db/local.db
+  ASTRO_DB_REMOTE_URL: file:./db/local.db
+
 on:
   push:
     branches: [ main, dev ]
@@ -13,7 +17,7 @@ jobs:
     
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [20.x, 22.x]
     
     steps:
     - name: Checkout code

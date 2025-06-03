@@ -7,7 +7,15 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "include": ["**/src/**/*", "**/tests/**/*"]
+    "include": [
+      "**/src/**/*",
+      "**/test/**/*",
+      "**/db/**/*",
+      "package.json",
+      "biome.json",
+      "tsconfig.json",
+      "astro.config.mjs"
+    ]
   },
   "formatter": {
     "enabled": true,
