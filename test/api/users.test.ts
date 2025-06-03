@@ -28,7 +28,7 @@ vi.mock('astro:db', () => {
   };
 });
 
-import { User, db, eq } from 'astro:db';
+import { User, db, eq, like } from 'astro:db';
 import { GET as getUserByIdHandler } from '../../src/pages/api/users/[id].ts';
 import { GET as getUsersHandler } from '../../src/pages/api/users/index.ts';
 import type { ApiResponse, User as IUser } from '../../src/utils/api.d';
@@ -37,6 +37,7 @@ import type { ApiResponse, User as IUser } from '../../src/utils/api.d';
 const mockDb = db as unknown as MockDatabase;
 const mockUser = User;
 const mockEq = eq as ReturnType<typeof vi.fn>;
+const mockLike = like as ReturnType<typeof vi.fn>;
 
 describe('Users API Endpoints', () => {
   beforeEach(() => {
@@ -44,11 +45,19 @@ describe('Users API Endpoints', () => {
     // Reset the mock chain to return itself for chaining
     mockDb.select.mockReturnValue(mockDb);
     mockDb.from.mockReturnValue(mockDb);
-    mockDb.where.mockReturnValue(mockUsers);
+    mockDb.where.mockReturnValue(mockDb);
+    mockDb.limit.mockReturnValue(mockDb);
+    mockDb.offset.mockReturnValue(mockUsers);
+
+    // Mock the like function
+    mockLike.mockReturnValue('like-condition');
   });
 
   test('should return all users without filters', async () => {
-    mockDb.from.mockResolvedValue(mockUsers);
+    // Mock the count query (returns all users for counting)
+    mockDb.from.mockResolvedValueOnce(mockUsers);
+    // Mock the paginated query (returns first 10 users)
+    mockDb.offset.mockResolvedValueOnce(mockUsers);
 
     const request = new Request('http://localhost/api/users');
     const context = createMockAPIContext(request);
@@ -65,7 +74,14 @@ describe('Users API Endpoints', () => {
 
   describe('GET /api/users', () => {
     test('should filter users by name', async () => {
-      mockDb.from.mockResolvedValue(mockUsers);
+      const filteredUsers = mockUsers.filter((user) =>
+        user.name.toLowerCase().includes('alice'),
+      );
+
+      // Mock the count query for filtered results
+      mockDb.where.mockResolvedValueOnce(filteredUsers);
+      // Mock the paginated filtered query
+      mockDb.offset.mockResolvedValueOnce(filteredUsers);
 
       const request = new Request('http://localhost/api/users?name=Alice');
       const context = createMockAPIContext(request);
@@ -78,10 +94,15 @@ describe('Users API Endpoints', () => {
       expect(
         data.data?.users.every((user: IUser) => user.name.includes('Alice')),
       ).toBe(true);
+      expect(mockLike).toHaveBeenCalledWith(mockUser.name, '%alice%');
     });
 
     test('should apply pagination correctly', async () => {
-      mockDb.from.mockResolvedValue(mockUsers);
+      // Mock the count query (returns all users for counting)
+      mockDb.from.mockResolvedValueOnce(mockUsers);
+      // Mock the paginated query (returns first 2 users)
+      const paginatedUsers = mockUsers.slice(0, 2);
+      mockDb.offset.mockResolvedValueOnce(paginatedUsers);
 
       const request = new Request(
         'http://localhost/api/users?limit=2&offset=0',
@@ -95,6 +116,7 @@ describe('Users API Endpoints', () => {
       expect(data.data.pagination.limit).toBe(2);
       expect(data.data.pagination.offset).toBe(0);
       expect(data.data.pagination.page).toBe(1);
+      expect(data.data.pagination.total).toBe(3);
     });
 
     test('should handle database errors', async () => {

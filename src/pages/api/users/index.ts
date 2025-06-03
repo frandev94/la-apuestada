@@ -1,4 +1,4 @@
-import { User, db } from 'astro:db';
+import { User, db, like } from 'astro:db';
 import type { APIRoute } from 'astro';
 
 // Define user type for better type safety
@@ -28,25 +28,37 @@ export const GET: APIRoute = async ({ request }) => {
       0,
       Number.parseInt(url.searchParams.get('offset') || '0', 10),
     );
-    const name = url.searchParams.get('name'); // Execute queries
+    const name = url.searchParams.get('name');
+
+    // Execute queries efficiently using database-level filtering and pagination
     let users: UserRow[];
     let totalCount: number;
 
     if (name?.trim()) {
-      // For simplicity, using a basic string includes search
-      // In production, you'd want to use proper text search with SQL LIKE
-      const allUsers = await db.select().from(User);
-      const filteredUsers = allUsers.filter((user: UserRow) =>
-        user.name.toLowerCase().includes(name.trim().toLowerCase()),
-      );
+      // Use database LIKE query for name filtering
+      const searchPattern = `%${name.trim().toLowerCase()}%`;
 
-      totalCount = filteredUsers.length;
-      users = filteredUsers.slice(offset, offset + limit);
+      // Get total count for pagination with filtering
+      const countResult = await db
+        .select()
+        .from(User)
+        .where(like(User.name, searchPattern));
+      totalCount = countResult.length;
+
+      // Get paginated filtered users
+      users = await db
+        .select()
+        .from(User)
+        .where(like(User.name, searchPattern))
+        .limit(limit)
+        .offset(offset);
     } else {
-      // Get all users first (for simplicity - in production you'd optimize this)
-      const allUsers = await db.select().from(User);
-      totalCount = allUsers.length;
-      users = allUsers.slice(offset, offset + limit);
+      // Get total count for pagination without filtering
+      const countResult = await db.select().from(User);
+      totalCount = countResult.length;
+
+      // Get paginated users without filtering
+      users = await db.select().from(User).limit(limit).offset(offset);
     } // Remove sensitive information from response
     const safeUsers: SafeUser[] = users.map((user: UserRow) => ({
       id: user.id,
