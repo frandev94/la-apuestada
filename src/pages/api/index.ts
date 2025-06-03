@@ -1,16 +1,12 @@
 import type { APIRoute } from 'astro';
+import { JsonResponse } from '../../utils/api';
 
 export const GET: APIRoute = async () => {
-  return new Response(
-    JSON.stringify({
-      success: true,
-      message: 'API is working',
-      data: {
-        endpoints: [
-          { method: 'GET', path: '/api/users' },
-          { method: 'GET', path: '/api/users/:id' },
-        ],
-      },
-    }),
-  );
+  return JsonResponse.success({
+    message: 'API is working',
+    endpoints: [
+      { method: 'GET', path: '/api/users' },
+      { method: 'GET', path: '/api/users/:id' },
+    ],
+  });
 };

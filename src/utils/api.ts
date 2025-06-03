@@ -122,3 +122,66 @@ export function sanitizeUser(user: User) {
   const { hashed_password, ...safeUser } = user;
   return safeUser;
 }
+
+/**
+ * JsonResponse class for creating JSON responses with proper headers
+ * Provides a more convenient way to create standardized JSON responses
+ */
+export class JsonResponse extends Response {
+  constructor(data: unknown, init?: ResponseInit) {
+    const headers = new Headers(init?.headers);
+    headers.set('Content-Type', 'application/json');
+
+    super(JSON.stringify(data), {
+      ...init,
+      headers,
+    });
+  }
+
+  /**
+   * Create a success JSON response
+   */
+  static success<T>(data: T, status = 200): JsonResponse {
+    return new JsonResponse(
+      {
+        success: true,
+        data,
+      } as ApiResponse<T>,
+      { status },
+    );
+  }
+
+  /**
+   * Create a failure JSON response
+   */
+  static failure(error: string, message: string, status = 500): JsonResponse {
+    return new JsonResponse(
+      {
+        success: false,
+        error,
+        message,
+      } as ApiResponse,
+      { status },
+    );
+  }
+
+  /**
+   * Create a paginated JSON response
+   */
+  static paginated<T>(
+    items: T[],
+    pagination: PaginationMeta,
+    status = 200,
+  ): JsonResponse {
+    return new JsonResponse(
+      {
+        success: true,
+        data: {
+          items,
+          pagination,
+        },
+      } as ApiResponse<{ items: T[]; pagination: PaginationMeta }>,
+      { status },
+    );
+  }
+}
