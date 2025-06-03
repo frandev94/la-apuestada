@@ -4,7 +4,10 @@ import { getViteConfig } from 'astro/config';
 export default getViteConfig({
   test: {
     environment: 'jsdom',
-    include: ['test/**/*.test.ts'],
+    include: [
+      'test/**/*.test.ts',
+      'test/**/*.spec.ts'
+    ],
     setupFiles: ['./test/setup.ts'],
     coverage: {
       provider: 'v8',
@@ -13,10 +16,15 @@ export default getViteConfig({
       exclude: [
         'src/**/*.d.ts',
         'src/**/*.test.{ts,tsx}',
+        'src/**/*.spec.{ts,tsx}',
         'src/**/index.ts',
         'src/**/types.ts',
+        'test/**/*',
       ],
     },
     globals: true,
+    // Test organization
+    testTimeout: 10000,
+    hookTimeout: 10000,
   },
 });
