@@ -1,2 +1,42 @@
 #!/bin/sh
-npm run test:ci
+# Pre-push hook: Run tests before pushing to prevent broken code in remote
+
+echo "🧪 Running tests before push..."
+
+# Check if there are any uncommitted changes
+if ! git diff-index --quiet HEAD --; then
+    echo "📦 Stashing uncommitted changes..."
+    git stash push -m "pre-push-stash-$(date +%s)" --include-untracked
+    STASH_CREATED=true
+else
+    echo "📋 No uncommitted changes to stash"
+    STASH_CREATED=false
+fi
+
+# Function to restore stashed changes
+restore_stash() {
+    if [ "$STASH_CREATED" = true ] && git stash list | grep -q "pre-push-stash"; then
+        echo "📤 Restoring stashed changes..."
+        git stash pop
+    fi
+}
+
+# Run tests
+echo "🔍 Running test suite..."
+npm run test
+
+# Capture test exit code
+TEST_RESULT=$?
+
+# Always restore stash, regardless of test results
+restore_stash
+
+# Check test results and exit accordingly
+if [ $TEST_RESULT -ne 0 ]; then
+    echo "❌ Tests failed! Push aborted."
+    echo "💡 Fix the failing tests before pushing."
+    exit 1
+else
+    echo "✅ All tests passed! Proceeding with push..."
+    exit 0
+fi

@@ -1,5 +1,5 @@
-import { vi, expect } from 'vitest';
 import type { APIContext } from 'astro';
+import { expect, vi } from 'vitest';
 import type { ApiResponse } from '../../src/utils/api.d';
 
 // Type definitions for better type safety
@@ -67,7 +67,9 @@ export const suppressConsole = () => {
 /**
  * Wrapper function to run a test with suppressed console output
  */
-export const withSuppressedConsole = async <T>(testFn: () => Promise<T> | T): Promise<T> => {
+export const withSuppressedConsole = async <T>(
+  testFn: () => Promise<T> | T,
+): Promise<T> => {
   const consoleSuppressor = suppressConsole();
   try {
     return await testFn();
@@ -80,8 +82,8 @@ export const withSuppressedConsole = async <T>(testFn: () => Promise<T> | T): Pr
  * Creates a mock APIContext for testing Astro API routes
  */
 export const createMockAPIContext = (
-  request: Request, 
-  params: Record<string, string> = {}
+  request: Request,
+  params: Record<string, string> = {},
 ): APIContext => {
   const url = new URL(request.url);
   return {
@@ -168,12 +170,14 @@ export const mockUsers: MockUser[] = [
 /**
  * Safe user data (without password)
  */
-export const mockSafeUsers: MockSafeUser[] = mockUsers.map(({ hashed_password, ...user }) => user);
+export const mockSafeUsers: MockSafeUser[] = mockUsers.map(
+  ({ hashed_password, ...user }) => user,
+);
 
 /**
  * Helper to create mock HTTP responses
  */
-export const createMockResponse = <T = any>(data: T, status = 200): Response => {
+export const createMockResponse = <T>(data: T, status = 200): Response => {
   return new Response(JSON.stringify(data), {
     status,
     headers: { 'Content-Type': 'application/json' },
@@ -183,7 +187,10 @@ export const createMockResponse = <T = any>(data: T, status = 200): Response => 
 /**
  * Helper to assert API response structure
  */
-export const expectAPIResponse = <T = any>(response: ApiResponse<T>, success = true): void => {
+export const expectAPIResponse = <T>(
+  response: ApiResponse<T>,
+  success = true,
+): void => {
   expect(response).toHaveProperty('success', success);
   if (success) {
     expect(response).toHaveProperty('data');
@@ -195,12 +202,15 @@ export const expectAPIResponse = <T = any>(response: ApiResponse<T>, success = t
 /**
  * Helper to create test request with query parameters
  */
-export const createTestRequest = (url: string, params?: Record<string, string>): Request => {
+export const createTestRequest = (
+  url: string,
+  params?: Record<string, string>,
+): Request => {
   const testUrl = new URL(url, 'http://localhost');
   if (params) {
-    Object.entries(params).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(params)) {
       testUrl.searchParams.set(key, value);
-    });
+    }
   }
   return new Request(testUrl.toString());
 };
@@ -208,7 +218,9 @@ export const createTestRequest = (url: string, params?: Record<string, string>):
 /**
  * Creates a typed mock function with proper return type
  */
-export const createTypedMock = <T extends (...args: any[]) => any>(): T => {
+export const createTypedMock = <
+  T extends (...args: unknown[]) => unknown,
+>(): T => {
   return vi.fn() as unknown as T;
 };
 
@@ -229,9 +241,12 @@ export const createMockUser = (overrides: Partial<MockUser> = {}): MockUser => {
 /**
  * Helper to create multiple mock users
  */
-export const createMockUsers = (count: number, baseUser: Partial<MockUser> = {}): MockUser[] => {
-  return Array.from({ length: count }, (_, index) => 
-    createMockUser({ id: index + 1, name: `User ${index + 1}`, ...baseUser })
+export const createMockUsers = (
+  count: number,
+  baseUser: Partial<MockUser> = {},
+): MockUser[] => {
+  return Array.from({ length: count }, (_, index) =>
+    createMockUser({ id: index + 1, name: `User ${index + 1}`, ...baseUser }),
   );
 };
 
