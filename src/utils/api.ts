@@ -70,14 +70,14 @@ export function createPaginatedResponse<T>(
  * Parse and validate pagination parameters from URL search params
  */
 export function parsePaginationParams(url: URL) {
+  const limitParam = Number.parseInt(url.searchParams.get('limit') || '10');
+  const offsetParam = Number.parseInt(url.searchParams.get('offset') || '0');
+
   const limit = Math.min(
     100,
-    Math.max(1, Number.parseInt(url.searchParams.get('limit') || '10')),
+    Math.max(1, Number.isNaN(limitParam) ? 10 : limitParam),
   );
-  const offset = Math.max(
-    0,
-    Number.parseInt(url.searchParams.get('offset') || '0'),
-  );
+  const offset = Math.max(0, Number.isNaN(offsetParam) ? 0 : offsetParam);
   const page = Math.floor(offset / limit) + 1;
 
   return { limit, offset, page };

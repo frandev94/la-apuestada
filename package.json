@@ -28,9 +28,10 @@
     "release:patch": "commit-and-tag-version --release-as patch"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx,astro}": ["biome check --write", "astro check"],
-    "*.{json,jsonc}": ["biome format --write"],
-    "*.{css,md}": ["biome format --write"]
+    "*.{js,ts,jsx,tsx,astro,json,jsonc,css}": [
+      "biome check --write",
+      "astro check"
+    ]
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

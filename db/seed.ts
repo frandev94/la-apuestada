@@ -15,7 +15,7 @@ export default async function seed() {
     return;
   }
 
-  const users = await db.insert(User).values([
+  await db.insert(User).values([
     {
       name: 'Wargios',
       hashed_password: createHash(DEFAULT_USER_PASSWORD),
