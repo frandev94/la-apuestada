@@ -1,5 +1,9 @@
 name: CI/CD Pipeline
 
+env:
+  ASTRO_DATABASE_FILE: ./db/local.db
+  ASTRO_DB_REMOTE_URL: file:./db/local.db
+
 on:
   push:
     branches: [ main, dev ]
