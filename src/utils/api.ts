@@ -1,4 +1,4 @@
-import type { User, ApiResponse, PaginationMeta } from './api.d';
+import type { ApiResponse, PaginationMeta, User } from './api.d';
 
 /**
  * Create a success API response

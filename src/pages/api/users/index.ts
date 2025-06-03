@@ -1,5 +1,5 @@
+import { User, db } from 'astro:db';
 import type { APIRoute } from 'astro';
-import { db, User } from 'astro:db';
 
 // Define user type for better type safety
 type UserRow = {

@@ -1,6 +1,6 @@
-import { db, User } from 'astro:db';
-import { createHash } from '../src/utils/auth.js';
+import { User, db } from 'astro:db';
 import { loadEnv } from 'vite';
+import { createHash } from '../src/utils/auth.js';
 
 const { DEFAULT_USER_PASSWORD } = loadEnv(
   process.env.NODE_ENV ?? '',
