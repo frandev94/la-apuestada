@@ -25,5 +25,4 @@ export default async function seed() {
       hashed_password: createHash(DEFAULT_USER_PASSWORD),
     },
   ]);
-  console.log('Users created:', JSON.stringify(users, null, 2));
 }

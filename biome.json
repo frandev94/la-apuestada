@@ -9,7 +9,7 @@
     "ignoreUnknown": true,
     "include": [
       "**/src/**/*",
-      "**/tests/**/*",
+      "**/test/**/*",
       "**/db/**/*",
       "package.json",
       "biome.json",

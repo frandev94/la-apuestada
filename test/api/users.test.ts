@@ -1,9 +1,9 @@
-import { describe, expect, test, beforeEach, vi } from 'vitest';
-import { 
-  createMockAPIContext, 
-  mockUsers, 
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+import {
+  type MockDatabase,
+  createMockAPIContext,
+  mockUsers,
   withSuppressedConsole,
-  type MockDatabase, 
 } from '../utils/test-helpers.js';
 
 // Mock astro:db - inline creation to avoid hoisting issues
@@ -28,10 +28,10 @@ vi.mock('astro:db', () => {
   };
 });
 
-import { GET as getUsersHandler } from '../../src/pages/api/users/index.ts';
+import { User, db, eq } from 'astro:db';
 import { GET as getUserByIdHandler } from '../../src/pages/api/users/[id].ts';
-import { db, User, eq } from 'astro:db';
-import type { ApiResponse } from '../../src/utils/api.d';
+import { GET as getUsersHandler } from '../../src/pages/api/users/index.ts';
+import type { ApiResponse, User as IUser } from '../../src/utils/api.d';
 
 // Type the mocked objects for better autocomplete and type safety
 const mockDb = db as unknown as MockDatabase;
@@ -53,7 +53,8 @@ describe('Users API Endpoints', () => {
     const request = new Request('http://localhost/api/users');
     const context = createMockAPIContext(request);
     const response = await getUsersHandler(context);
-    const data: ApiResponse<{ users: any[]; pagination: any }> = await response.json();
+    const data: ApiResponse<{ users: IUser[]; pagination: { total: number } }> =
+      await response.json();
 
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
@@ -69,20 +70,22 @@ describe('Users API Endpoints', () => {
       const request = new Request('http://localhost/api/users?name=Alice');
       const context = createMockAPIContext(request);
       const response = await getUsersHandler(context);
-      const data = await response.json();
-
-      console.log(data.data.users); // For debugging purposes
+      const data: ApiResponse<{ users: IUser[] }> = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data.users).toHaveLength(2);
-      expect(data.data.users.every((user: any) => user.name.includes('Alice'))).toBe(true);
+      expect(data.data?.users).toHaveLength(2);
+      expect(
+        data.data?.users.every((user: IUser) => user.name.includes('Alice')),
+      ).toBe(true);
     });
 
     test('should apply pagination correctly', async () => {
       mockDb.from.mockResolvedValue(mockUsers);
 
-      const request = new Request('http://localhost/api/users?limit=2&offset=0');
+      const request = new Request(
+        'http://localhost/api/users?limit=2&offset=0',
+      );
       const context = createMockAPIContext(request);
       const response = await getUsersHandler(context);
       const data = await response.json();
@@ -99,12 +102,12 @@ describe('Users API Endpoints', () => {
 
       const request = new Request('http://localhost/api/users');
       const context = createMockAPIContext(request);
-      
+
       // Suppress console output for this known error test
       const response = await withSuppressedConsole(async () => {
         return await getUsersHandler(context);
       });
-      
+
       const data = await response.json();
 
       expect(response.status).toBe(500);
@@ -118,9 +121,12 @@ describe('Users API Endpoints', () => {
       const targetUser = mockUsers[0];
       mockDb.where.mockResolvedValue([targetUser]);
 
-      const context = createMockAPIContext(new Request('http://localhost/api/users/1'), { id: '1' });
+      const context = createMockAPIContext(
+        new Request('http://localhost/api/users/1'),
+        { id: '1' },
+      );
       const response = await getUserByIdHandler(context);
-      const data: ApiResponse<{ user: any }> = await response.json();
+      const data: ApiResponse<{ user: IUser }> = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
@@ -133,7 +139,10 @@ describe('Users API Endpoints', () => {
     test('should return 404 when user does not exist', async () => {
       mockDb.where.mockResolvedValue([]);
 
-      const context = createMockAPIContext(new Request('http://localhost/api/users/999'), { id: '999' });
+      const context = createMockAPIContext(
+        new Request('http://localhost/api/users/999'),
+        { id: '999' },
+      );
       const response = await getUserByIdHandler(context);
       const data: ApiResponse = await response.json();
 
@@ -144,7 +153,10 @@ describe('Users API Endpoints', () => {
     });
 
     test('should return 400 for invalid user ID', async () => {
-      const context = createMockAPIContext(new Request('http://localhost/api/users/invalid'), { id: 'invalid' });
+      const context = createMockAPIContext(
+        new Request('http://localhost/api/users/invalid'),
+        { id: 'invalid' },
+      );
       const response = await getUserByIdHandler(context);
       const data = await response.json();
 
@@ -157,13 +169,16 @@ describe('Users API Endpoints', () => {
     test('should handle database errors', async () => {
       mockDb.where.mockRejectedValue(new Error('Database error'));
 
-      const context = createMockAPIContext(new Request('http://localhost/api/users/1'), { id: '1' });
-      
+      const context = createMockAPIContext(
+        new Request('http://localhost/api/users/1'),
+        { id: '1' },
+      );
+
       // Suppress console output for this known error test
       const response = await withSuppressedConsole(async () => {
         return await getUserByIdHandler(context);
       });
-      
+
       const data = await response.json();
 
       expect(response.status).toBe(500);
