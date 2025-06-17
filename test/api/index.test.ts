@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { GET } from '../../src/pages/api/index.ts';
-import { createMockAPIContext } from '../utils/test-helpers.js';
+import { createMockAPIContext } from '../utils/test-helpers';
 
 describe('API Index Endpoint', () => {
   test('should return API info and available endpoints', async () => {

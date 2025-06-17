@@ -4,7 +4,7 @@ import {
   createMockAPIContext,
   mockUsers,
   withSuppressedConsole,
-} from '../utils/test-helpers.js';
+} from '../utils/test-helpers';
 
 // Mock astro:db - inline creation to avoid hoisting issues
 vi.mock('astro:db', () => {
