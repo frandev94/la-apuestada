@@ -26,6 +26,7 @@ The project follows a clean and organized structure:
 │   ├── components/  # Reusable UI components
 │   ├── data/        # Data models and type definitions
 │   ├── layouts/     # Page layout templates
+│   ├── lib/         # Utility functions and shared logic
 │   ├── pages/       # Application pages and routes
 │   └── styles/      # Global stylesheets
 ├── test/            # Test files and test configuration

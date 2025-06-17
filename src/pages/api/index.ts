@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { JsonResponse } from '../../utils/api';
+import { JsonResponse } from '../../lib/api';
 
 export const GET: APIRoute = async () => {
   return JsonResponse.success({

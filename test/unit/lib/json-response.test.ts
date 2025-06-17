@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { JsonResponse } from '../../src/utils/api';
+import { JsonResponse } from '../../../src/lib/api';
 
 describe('JsonResponse', () => {
   it('should create a basic JSON response with proper headers', async () => {
