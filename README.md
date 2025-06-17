@@ -42,16 +42,21 @@ All commands are run from the root of the project, from a terminal:
 | `npm run dev`             | Starts local dev server at `localhost:4321`      |
 | `npm run build`           | Build your production site to `./dist/`          |
 | `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run test`            | Run tests with Vitest                           |
+| `npm run test`            | Run all tests (unit, API, and e2e)              |
+| `npm run test:unit-api`   | Run only unit and API tests with Vitest         |
 | `npm run test:coverage`   | Run tests with coverage report                  |
+| `npm run test:e2e`        | Run end-to-end tests with Playwright            |
+| `npm run test:e2e:ui`     | Run e2e tests with interactive UI               |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
 ## 🛠️ Tech Stack
 
 - **Framework**: Astro
-- **Styling**: CSS with modern features
-- **Testing**: Vitest
+- **Database**: Astro DB
+- **Styling**: CSS with modern features + TailwindCSS
+- **Unit Testing**: Vitest
+- **E2E Testing**: Playwright
 - **Code Quality**: Biome (linting & formatting)
 - **Language**: TypeScript
 
@@ -62,12 +67,33 @@ All commands are run from the root of the project, from a terminal:
 3. Start the development server: `npm run dev`
 4. Open your browser to `http://localhost:4321`
 
+## 🧪 Testing
+
+This project includes comprehensive testing coverage:
+
+### Unit & Integration Tests (Vitest)
+- **Run all tests**: `npm run test` (includes unit, API, and e2e tests)
+- **Run only unit/API tests**: `npm run test:unit-api`
+- **Watch mode**: `npm run test:watch`
+- **Coverage report**: `npm run test:coverage`
+- **Test specific areas**: `npm run test:api`, `npm run test:unit`
+
+### End-to-End Tests (Playwright)
+- **Run all tests**: `npm test` (includes unit, API, and e2e tests)
+- **Run only e2e tests**: `npm run test:e2e`
+- **Interactive UI**: `npm run test:e2e:ui`
+- **Debug mode**: `npm run test:e2e:debug`
+- **Help to generate tests**: `npm run test:e2e:codegen`
+
+The project maintains focused test coverage with unit tests for detailed logic testing and e2e tests for API integration validation. See [E2E Testing Documentation](./docs/e2e-testing.md) for more details.
+
 ## 📋 Development
 
-This project includes comprehensive testing and code quality tools:
-- Run tests: `npm run test`
-- Generate coverage: `npm run test:coverage`
-- Code formatting and linting handled by Biome
+This project includes comprehensive development tools:
+- **Code Quality**: Biome for linting and formatting
+- **Type Safety**: TypeScript with strict configuration
+- **Pre-commit Hooks**: Husky with lint-staged for quality enforcement
+- **Database**: Astro DB with migrations and seeding
 
 ## 🥊 About La Velada del Año
 
