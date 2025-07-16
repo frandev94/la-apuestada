@@ -25,9 +25,9 @@ updates:
       time: "04:00"
     open-pull-requests-limit: 3
     reviewers:
-      - "fcojg"
+      - "frandev94"
     assignees:
-      - "fcojg"
+      - "frandev94"
     commit-message:
       prefix: "ci"
       include: "scope"
