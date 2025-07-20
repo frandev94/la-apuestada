@@ -26,6 +26,7 @@ The project follows a clean and organized structure:
 │   ├── components/  # Reusable UI components
 │   ├── data/        # Data models and type definitions
 │   ├── layouts/     # Page layout templates
+│   ├── lib/         # Utility functions and shared logic
 │   ├── pages/       # Application pages and routes
 │   └── styles/      # Global stylesheets
 ├── test/            # Test files and test configuration
@@ -50,8 +51,9 @@ All commands are run from the root of the project, from a terminal:
 ## 🛠️ Tech Stack
 
 - **Framework**: Astro
-- **Styling**: CSS with modern features
-- **Testing**: Vitest
+- **Database**: Astro DB
+- **Styling**: CSS with modern features + TailwindCSS
+- **Unit Testing**: Vitest
 - **Code Quality**: Biome (linting & formatting)
 - **Language**: TypeScript
 
@@ -62,12 +64,25 @@ All commands are run from the root of the project, from a terminal:
 3. Start the development server: `npm run dev`
 4. Open your browser to `http://localhost:4321`
 
+## 🧪 Testing
+
+This project includes comprehensive testing coverage:
+
+- **Run tests**: `npm run test`
+- **Watch mode**: `npm run test:watch`
+- **Coverage report**: `npm run test:coverage`
+- **UI for tests**: `npm run test:ui` (Vitest UI)
+
+The project maintains focused test coverage with unit tests for detailed logic testing and API tests for integration validation.
+
 ## 📋 Development
 
-This project includes comprehensive testing and code quality tools:
-- Run tests: `npm run test`
-- Generate coverage: `npm run test:coverage`
-- Code formatting and linting handled by Biome
+This project includes comprehensive development tools:
+
+- **Code Quality**: Biome for linting and formatting
+- **Type Safety**: TypeScript with strict configuration
+- **Pre-commit Hooks**: Husky with lint-staged for quality enforcement
+- **Database**: Astro DB with migrations and seeding
 
 ## 🥊 About La Velada del Año
 
@@ -84,4 +99,3 @@ This application helps fans engage with the event by creating betting pools, mak
 
 - [Official La Velada Website](https://www.infolavelada.com/)
 - [Watch on Twitch (Ibai)](https://twitch.tv/ibai)
-

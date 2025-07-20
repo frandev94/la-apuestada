@@ -4,7 +4,7 @@ import {
   createMockAPIContext,
   mockUsers,
   withSuppressedConsole,
-} from '../utils/test-helpers.js';
+} from '../utils/test-helpers';
 
 // Mock astro:db - inline creation to avoid hoisting issues
 vi.mock('astro:db', () => {
@@ -29,9 +29,9 @@ vi.mock('astro:db', () => {
 });
 
 import { User, db, eq, like } from 'astro:db';
+import type { ApiResponse, User as IUser } from '../../src/lib/api.d';
 import { GET as getUserByIdHandler } from '../../src/pages/api/users/[id].ts';
 import { GET as getUsersHandler } from '../../src/pages/api/users/index.ts';
-import type { ApiResponse, User as IUser } from '../../src/utils/api.d';
 
 // Type the mocked objects for better autocomplete and type safety
 const mockDb = db as unknown as MockDatabase;

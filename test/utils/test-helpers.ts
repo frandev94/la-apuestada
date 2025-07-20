@@ -1,21 +1,21 @@
 import type { APIContext } from 'astro';
 import { expect, vi } from 'vitest';
-import type { ApiResponse } from '../../src/utils/api.d';
+import type { ApiResponse } from '../../src/lib/api.d';
 
 // Type definitions for better type safety
 export interface MockUser {
   id: number;
   name: string;
   hashed_password: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface MockSafeUser {
   id: number;
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface MockDatabase {
@@ -148,22 +148,22 @@ export const mockUsers: MockUser[] = [
     id: 1,
     name: 'Alice Smith',
     hashed_password: 'hashed_password1',
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01'),
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   },
   {
     id: 2,
     name: 'Bob Johnson',
     hashed_password: 'hashed_password2',
-    createdAt: new Date('2024-01-02'),
-    updatedAt: new Date('2024-01-02'),
+    createdAt: '2024-01-02T00:00:00Z',
+    updatedAt: '2024-01-02T00:00:00Z',
   },
   {
     id: 3,
     name: 'Alice Brown',
     hashed_password: 'hashed_password3',
-    createdAt: new Date('2024-01-03'),
-    updatedAt: new Date('2024-01-03'),
+    createdAt: '2024-01-03T00:00:00Z',
+    updatedAt: '2024-01-03T00:00:00Z',
   },
 ];
 
@@ -232,8 +232,8 @@ export const createMockUser = (overrides: Partial<MockUser> = {}): MockUser => {
     id: 1,
     name: 'Test User',
     hashed_password: 'hashed_password',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     ...overrides,
   };
 };

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createHash, verifyPassword } from '../../src/utils/auth';
+import { createHash, verifyPassword } from '../../../src/lib/auth';
 
 describe('Auth Utils', () => {
   describe('createHash', () => {

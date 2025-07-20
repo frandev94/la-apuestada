@@ -2,69 +2,129 @@
 
 This document describes the test structure and organization for the La Apuestada project.
 
+## 🚀 Quick Start
+
+- **Run all tests**: `npm test` (runs unit/API tests)
+- **Run only unit tests**: `npm run test:unit`
+- **Run only API tests**: `npm run test:api`
+- **Run with coverage**: `npm run test:coverage`
+
 ## 📁 Directory Structure
 
-```
+```text
 test/
 ├── setup.ts                    # Global test setup and configuration
-├── api/                        # API endpoint tests
-│   └── *.test.ts               # Tests for API routes and endpoints
-├── unit/                       # Unit tests for business logic and utilities
-│   └── *.test.ts               # Tests for individual functions and modules
-├── integration/                # Integration tests
-│   └── *.test.ts               # Tests for component interactions
+├── fixtures/                   # 🆕 Centralized test data management
+│   ├── users.ts                # User-related test fixtures and data
+│   └── api.ts                  # API endpoint test fixtures
+├── api/                        # API endpoint tests (mirrors src/pages/api/)
+│   └── *.test.ts               # Tests for API endpoints
+├── unit/                       # Unit tests (mirrors src/ structure)
+│   ├── data/                   # Tests for src/data/ modules
+│   │   └── *.test.ts           # Data layer tests
+│   └── lib/                    # Tests for src/lib/ modules
+│       └── *.test.ts           # Library function tests
 └── utils/                      # Test utilities and helpers
-    ├── *.test.ts               # Basic functionality tests
     ├── test-helpers.ts         # Shared test utilities
-    └── *.md                    # Documentation files
+    └── custom-matchers.ts      # 🆕 Domain-specific test matchers
+```
+
+## 🆕 New Testing Features
+
+### Test Fixtures (`test/fixtures/`)
+
+Centralized test data management for consistent and maintainable tests:
+
+- **`users.ts`**: User-related test data, including valid/invalid scenarios and pagination test cases
+- **`api.ts`**: API endpoint information and common HTTP status codes
+
+**Usage Example:**
+
+```typescript
+import { validUserData, mockUserRecords, paginationTestCases } from '../fixtures/users';
+
+test('should create user with valid data', () => {
+  const result = createUser(validUserData);
+  expect(result).toBeDefined();
+});
+```
+
+### Custom Matchers (`test/utils/custom-matchers.ts`)
+
+Domain-specific assertions for improved test readability:
+
+- **`.toBeSuccessfulApiResponse()`**: Validates successful API response structure
+- **`.toBeErrorApiResponse(code?)`**: Validates error API response with optional error code
+- **`.toHavePaginationStructure()`**: Validates pagination response structure
+- **`.toBeValidUser()`**: Validates user object structure (without sensitive fields)
+- **`.toBeValidUserList()`**: Validates array of user objects
+
+**Usage Example:**
+
+```typescript
+expect(response).toBeSuccessfulApiResponse();
+expect(errorResponse).toBeErrorApiResponse('VALIDATION_ERROR');
+expect(data).toHavePaginationStructure();
+expect(user).toBeValidUser();
+```
+
+### Data-Driven Tests with `describe.each`
+
+Parametrized testing for comprehensive coverage with minimal code duplication:
+
+```typescript
+describe.each(paginationTestCases)(
+  'calculatePagination with page=$page, limit=$limit, totalUsers=$totalUsers',
+  ({ page, limit, totalUsers, expectedOffset, expectedTotalPages }) => {
+    test(`should calculate correct offset: ${expectedOffset}`, () => {
+      const result = calculatePagination(page, limit, totalUsers);
+      expect(result.offset).toBe(expectedOffset);
+    });
+  }
+);
 ```
 
 ## 🧪 Test Categories
 
 ### API Tests (`test/api/`)
-Tests for Astro API routes and endpoints.
+
+Tests for Astro API routes and endpoints that mirror the `src/pages/api/` structure.
 - **Purpose**: Validate HTTP request/response handling, status codes, and JSON responses
 - **Scope**: Individual API endpoints and route handlers
-- **Examples**: 
-  - GET/POST/PUT/DELETE endpoint behavior
-  - Request parameter validation
-  - Response format consistency
-  - Error handling and status codes
+- **Structure**: Mirrors `src/pages/api/` directory structure
+- **🆕 Enhanced**: Now uses custom matchers for cleaner assertions
 
 ### Unit Tests (`test/unit/`)
-Tests for individual functions, components, and utility modules.
+
+Tests for individual functions, components, and utility modules that mirror the `src/` structure.
+
 - **Purpose**: Validate business logic, utilities, and helper functions in isolation
 - **Scope**: Single functions, classes, or small modules
-- **Examples**: 
-  - Data validation functions
-  - Utility functions (auth, formatting, calculations)
-  - Component logic
-  - Pure business logic
+- **Structure**: Mirrors `src/` directory structure (`lib/`, `data/`, etc.)
+- **🆕 Enhanced**: Includes data-driven tests and fixture-based testing
 
-### Integration Tests (`test/integration/`)
-Tests for interactions between multiple components or systems.
-- **Purpose**: Validate component interactions and workflow integration
-- **Scope**: Multiple modules working together, database interactions, external services
-- **Examples**: 
-  - End-to-end user workflows
-  - Database operations with business logic
-  - API integration with data layer
-  - Complex feature interactions
+## 🗂️ File Organization Principles
 
-### Utility Tests (`test/utils/`)
-Infrastructure tests and test helper validation.
-- **Purpose**: Validate test infrastructure and provide testing utilities
-- **Scope**: Test helpers, mock factories, and basic functionality validation
-- **Examples**:
-  - Test helper function validation
-  - Mock data generation
-  - Basic mathematical operations
-  - Development environment setup
+1. **Mirror source structure**: Test directories mirror the `src/` structure
+2. **Clear separation**: API tests and unit tests are clearly separated
+3. **Logical grouping**: Related tests are grouped in the same directory
+4. **Easy navigation**: Finding tests for a specific source file is intuitive
+
+### Finding Tests for Source Files
+
+| Source File | Test Location |
+|-------------|---------------|
+| `src/lib/auth.ts` | `test/unit/lib/auth.test.ts` |
+| `src/lib/api.ts` | `test/unit/lib/api.test.ts` |
+| `src/data/participants.ts` | `test/unit/data/participants.test.ts` |
+| `src/pages/api/users/index.ts` | `test/api/users.test.ts` |
+| `src/pages/api/index.ts` | `test/api/index.test.ts` |
 
 ## 🛠️ Test Utilities
 
-### `test-helpers.ts`
-Provides common utilities for testing:
+### `test/utils/test-helpers.ts`
+
+Provides common utilities for testing across all test categories:
 
 - **`createMockAPIContext()`**: Creates mock Astro API context
 - **`createMockDatabase()`**: Factory for mocking astro:db
@@ -78,6 +138,7 @@ Provides common utilities for testing:
 For tests that intentionally trigger errors (like database error scenarios), you can suppress console output to keep test results clean.
 
 ### Manual Suppression for Error Testing
+
 Use the `withSuppressedConsole()` utility when testing error scenarios:
 
 ```typescript
@@ -106,18 +167,10 @@ test('with manual control', () => {
 ```
 
 This approach keeps console output clean during error testing while preserving normal logging for debugging.
-  const consoleSuppressor = suppressConsole();
-  
-  // Test code that logs to console
-  
-  consoleSuppressor.restore();
-});
-```
-
-This ensures test output remains clean while still testing error handling properly.
 
 ### TypeScript Types
-For enhanced type safety and better developer experience, see [TYPED_MOCKS.md](./TYPED_MOCKS.md) for detailed information about using TypeScript types with mocks.
+
+For enhanced type safety and better developer experience, all test utilities include proper TypeScript types for better autocomplete and error detection.
 
 ## 🏃‍♂️ Running Tests
 
@@ -128,14 +181,6 @@ npm test
 # Run specific test categories
 npm run test:api           # API tests only
 npm run test:unit          # Unit tests only  
-npm run test:integration   # Integration tests only
-npm run test:utils         # Utility tests only
-
-# Run tests by pattern
-npm test -- test/api/      # All API tests
-npm test -- test/unit/     # All unit tests
-npm test -- "**/*auth*"    # All auth-related tests
-npm test -- users          # All tests containing "users"
 
 # Run with coverage
 npm run test:coverage
@@ -143,13 +188,19 @@ npm run test:coverage
 # Watch mode for development
 npm run test:watch
 
+# Run tests with UI
+npm run test:ui            # Vitest UI
+
 # Run specific test file
-npm test -- auth.test.ts
+npx vitest run test/unit/lib/auth.test.ts     # Specific unit test
+npx vitest run test/api/users.test.ts         # Specific API test
+npx vitest run auth.test.ts                   # Run any test matching pattern
 ```
 
 ## 📝 Writing Tests
 
 ### API Tests Example
+
 ```typescript
 import { describe, expect, test, beforeEach, vi } from 'vitest';
 import { createMockAPIContext } from '../utils/test-helpers.js';
@@ -168,9 +219,10 @@ describe('API Endpoint', () => {
 ```
 
 ### Unit Tests Example
+
 ```typescript
 import { describe, expect, test } from 'vitest';
-import { functionToTest } from '../../src/utils/module.js';
+import { functionToTest } from '../../../src/lib/module.js';
 
 describe('Module Name', () => {
   test('should handle valid input correctly', () => {
@@ -184,23 +236,9 @@ describe('Module Name', () => {
 });
 ```
 
-### Integration Tests Example
-```typescript
-import { describe, expect, test } from 'vitest';
-import { performComplexOperation } from '../../src/services/index.js';
-
-describe('Complex Operation Flow', () => {
-  test('should complete end-to-end workflow', async () => {
-    const result = await performComplexOperation(testData);
-    expect(result.status).toBe('completed');
-    expect(result.data).toMatchObject(expectedStructure);
-  });
-});
-```
-
 ## 🎯 Best Practices
 
-1. **Organize by purpose**: API, unit, integration, utils - each serves a specific testing need
+1. **Follow source structure**: Test organization mirrors source code organization
 2. **Use descriptive names**: Test descriptions should explain the expected behavior
 3. **Mock external dependencies**: Keep tests isolated and predictable
 4. **Share common utilities**: Reuse test helpers and mock data across test files
@@ -208,15 +246,15 @@ describe('Complex Operation Flow', () => {
 6. **Keep tests focused**: One concept or behavior per test
 7. **Use meaningful assertions**: Test the right things, not just that code runs
 8. **Follow naming conventions**: 
-   - `*.test.ts` for all test files
+   - `*.test.ts` for unit and API tests
    - Descriptive test and describe block names
    - Group related tests logically
+9. **Organize by source structure**: Easy to find tests for any source file
 
 ## 📊 Coverage Goals
 
 - **API endpoints**: 100% coverage for request/response handling
 - **Business logic & utilities**: 90%+ coverage for core functionality  
-- **Integration workflows**: Key user journeys and data flows covered
 - **Error handling**: All error paths and edge cases tested
 
 ## 🔄 Test Maintenance
@@ -226,3 +264,4 @@ describe('Complex Operation Flow', () => {
 - **Refactor tests when refactoring code**: Keep tests in sync with implementation
 - **Remove obsolete tests**: Clean up tests for removed features
 - **Document complex test scenarios**: Add comments for non-obvious test logic
+- **Maintain directory structure**: Keep test structure aligned with source structure

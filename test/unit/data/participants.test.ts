@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 import {
   laVeladaParticipants,
   validateParticipantsList,
-} from '../../src/data/participants.js';
+} from '../../../src/data/participants';
 
 describe('Participants Module', () => {
   test('basic import test', () => {
