@@ -4,15 +4,14 @@ This document describes the test structure and organization for the La Apuestada
 
 ## 🚀 Quick Start
 
-- **Run all tests**: `npm test` (runs both unit/API tests and e2e tests)
+- **Run all tests**: `npm test` (runs unit/API tests)
 - **Run only unit tests**: `npm run test:unit`
 - **Run only API tests**: `npm run test:api`
-- **Run only e2e tests**: `npm run test:e2e`
 - **Run with coverage**: `npm run test:coverage`
 
 ## 📁 Directory Structure
 
-```
+```text
 test/
 ├── setup.ts                    # Global test setup and configuration
 ├── fixtures/                   # 🆕 Centralized test data management
@@ -20,8 +19,6 @@ test/
 │   └── api.ts                  # API endpoint test fixtures
 ├── api/                        # API endpoint tests (mirrors src/pages/api/)
 │   └── *.test.ts               # Tests for API endpoints
-├── e2e/                        # End-to-end tests (Playwright)
-│   └── *.spec.ts               # E2E integration tests
 ├── unit/                       # Unit tests (mirrors src/ structure)
 │   ├── data/                   # Tests for src/data/ modules
 │   │   └── *.test.ts           # Data layer tests
@@ -35,11 +32,14 @@ test/
 ## 🆕 New Testing Features
 
 ### Test Fixtures (`test/fixtures/`)
+
 Centralized test data management for consistent and maintainable tests:
+
 - **`users.ts`**: User-related test data, including valid/invalid scenarios and pagination test cases
 - **`api.ts`**: API endpoint information and common HTTP status codes
 
 **Usage Example:**
+
 ```typescript
 import { validUserData, mockUserRecords, paginationTestCases } from '../fixtures/users';
 
@@ -50,6 +50,7 @@ test('should create user with valid data', () => {
 ```
 
 ### Custom Matchers (`test/utils/custom-matchers.ts`)
+
 Domain-specific assertions for improved test readability:
 
 - **`.toBeSuccessfulApiResponse()`**: Validates successful API response structure
@@ -59,6 +60,7 @@ Domain-specific assertions for improved test readability:
 - **`.toBeValidUserList()`**: Validates array of user objects
 
 **Usage Example:**
+
 ```typescript
 expect(response).toBeSuccessfulApiResponse();
 expect(errorResponse).toBeErrorApiResponse('VALIDATION_ERROR');
@@ -67,6 +69,7 @@ expect(user).toBeValidUser();
 ```
 
 ### Data-Driven Tests with `describe.each`
+
 Parametrized testing for comprehensive coverage with minimal code duplication:
 
 ```typescript
@@ -84,6 +87,7 @@ describe.each(paginationTestCases)(
 ## 🧪 Test Categories
 
 ### API Tests (`test/api/`)
+
 Tests for Astro API routes and endpoints that mirror the `src/pages/api/` structure.
 - **Purpose**: Validate HTTP request/response handling, status codes, and JSON responses
 - **Scope**: Individual API endpoints and route handlers
@@ -91,21 +95,18 @@ Tests for Astro API routes and endpoints that mirror the `src/pages/api/` struct
 - **🆕 Enhanced**: Now uses custom matchers for cleaner assertions
 
 ### Unit Tests (`test/unit/`)
+
 Tests for individual functions, components, and utility modules that mirror the `src/` structure.
+
 - **Purpose**: Validate business logic, utilities, and helper functions in isolation
 - **Scope**: Single functions, classes, or small modules
 - **Structure**: Mirrors `src/` directory structure (`lib/`, `data/`, etc.)
 - **🆕 Enhanced**: Includes data-driven tests and fixture-based testing
 
-### End-to-End Tests (`test/e2e/`)
-Focused API integration tests using Playwright that test the HTTP endpoints.
-- **Purpose**: Validate API endpoints work correctly in the complete application stack
-- **Scope**: Essential API integration testing with real HTTP requests
-
 ## 🗂️ File Organization Principles
 
 1. **Mirror source structure**: Test directories mirror the `src/` structure
-2. **Clear separation**: API tests, unit tests, and e2e tests are clearly separated
+2. **Clear separation**: API tests and unit tests are clearly separated
 3. **Logical grouping**: Related tests are grouped in the same directory
 4. **Easy navigation**: Finding tests for a specific source file is intuitive
 
@@ -122,6 +123,7 @@ Focused API integration tests using Playwright that test the HTTP endpoints.
 ## 🛠️ Test Utilities
 
 ### `test/utils/test-helpers.ts`
+
 Provides common utilities for testing across all test categories:
 
 - **`createMockAPIContext()`**: Creates mock Astro API context
@@ -136,6 +138,7 @@ Provides common utilities for testing across all test categories:
 For tests that intentionally trigger errors (like database error scenarios), you can suppress console output to keep test results clean.
 
 ### Manual Suppression for Error Testing
+
 Use the `withSuppressedConsole()` utility when testing error scenarios:
 
 ```typescript
@@ -166,6 +169,7 @@ test('with manual control', () => {
 This approach keeps console output clean during error testing while preserving normal logging for debugging.
 
 ### TypeScript Types
+
 For enhanced type safety and better developer experience, all test utilities include proper TypeScript types for better autocomplete and error detection.
 
 ## 🏃‍♂️ Running Tests
@@ -177,7 +181,6 @@ npm test
 # Run specific test categories
 npm run test:api           # API tests only
 npm run test:unit          # Unit tests only  
-npm run test:e2e           # E2E tests only
 
 # Run with coverage
 npm run test:coverage
@@ -188,11 +191,6 @@ npm run test:watch
 # Run tests with UI
 npm run test:ui            # Vitest UI
 
-# E2E specific commands
-npm run test:e2e:ui        # E2E tests with UI
-npm run test:e2e:debug     # E2E tests in debug mode
-npm run test:e2e:codegen   # Generate E2E tests
-
 # Run specific test file
 npx vitest run test/unit/lib/auth.test.ts     # Specific unit test
 npx vitest run test/api/users.test.ts         # Specific API test
@@ -202,6 +200,7 @@ npx vitest run auth.test.ts                   # Run any test matching pattern
 ## 📝 Writing Tests
 
 ### API Tests Example
+
 ```typescript
 import { describe, expect, test, beforeEach, vi } from 'vitest';
 import { createMockAPIContext } from '../utils/test-helpers.js';
@@ -220,6 +219,7 @@ describe('API Endpoint', () => {
 ```
 
 ### Unit Tests Example
+
 ```typescript
 import { describe, expect, test } from 'vitest';
 import { functionToTest } from '../../../src/lib/module.js';
@@ -236,22 +236,6 @@ describe('Module Name', () => {
 });
 ```
 
-### End-to-End Tests Example
-```typescript
-import { test, expect } from '@playwright/test';
-
-test.describe('API Endpoints E2E', () => {
-  test('GET /api/users returns users list', async ({ request }) => {
-    const response = await request.get('/api/users');
-    expect(response.status()).toBe(200);
-    
-    const data = await response.json();
-    expect(data.success).toBe(true);
-    expect(data.data).toHaveProperty('users');
-  });
-});
-```
-
 ## 🎯 Best Practices
 
 1. **Follow source structure**: Test organization mirrors source code organization
@@ -263,7 +247,6 @@ test.describe('API Endpoints E2E', () => {
 7. **Use meaningful assertions**: Test the right things, not just that code runs
 8. **Follow naming conventions**: 
    - `*.test.ts` for unit and API tests
-   - `*.spec.ts` for E2E tests
    - Descriptive test and describe block names
    - Group related tests logically
 9. **Organize by source structure**: Easy to find tests for any source file
@@ -272,7 +255,6 @@ test.describe('API Endpoints E2E', () => {
 
 - **API endpoints**: 100% coverage for request/response handling
 - **Business logic & utilities**: 90%+ coverage for core functionality  
-- **End-to-end workflows**: Key user journeys and critical functionality covered
 - **Error handling**: All error paths and edge cases tested
 
 ## 🔄 Test Maintenance

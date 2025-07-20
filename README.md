@@ -43,11 +43,8 @@ All commands are run from the root of the project, from a terminal:
 | `npm run dev`             | Starts local dev server at `localhost:4321`      |
 | `npm run build`           | Build your production site to `./dist/`          |
 | `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run test`            | Run all tests (unit, API, and e2e)              |
-| `npm run test:unit-api`   | Run only unit and API tests with Vitest         |
+| `npm run test`            | Run tests with Vitest                           |
 | `npm run test:coverage`   | Run tests with coverage report                  |
-| `npm run test:e2e`        | Run end-to-end tests with Playwright            |
-| `npm run test:e2e:ui`     | Run e2e tests with interactive UI               |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
@@ -57,7 +54,6 @@ All commands are run from the root of the project, from a terminal:
 - **Database**: Astro DB
 - **Styling**: CSS with modern features + TailwindCSS
 - **Unit Testing**: Vitest
-- **E2E Testing**: Playwright
 - **Code Quality**: Biome (linting & formatting)
 - **Language**: TypeScript
 
@@ -72,25 +68,17 @@ All commands are run from the root of the project, from a terminal:
 
 This project includes comprehensive testing coverage:
 
-### Unit & Integration Tests (Vitest)
-- **Run all tests**: `npm run test` (includes unit, API, and e2e tests)
-- **Run only unit/API tests**: `npm run test:unit-api`
+- **Run tests**: `npm run test`
 - **Watch mode**: `npm run test:watch`
 - **Coverage report**: `npm run test:coverage`
-- **Test specific areas**: `npm run test:api`, `npm run test:unit`
+- **UI for tests**: `npm run test:ui` (Vitest UI)
 
-### End-to-End Tests (Playwright)
-- **Run all tests**: `npm test` (includes unit, API, and e2e tests)
-- **Run only e2e tests**: `npm run test:e2e`
-- **Interactive UI**: `npm run test:e2e:ui`
-- **Debug mode**: `npm run test:e2e:debug`
-- **Help to generate tests**: `npm run test:e2e:codegen`
-
-The project maintains focused test coverage with unit tests for detailed logic testing and e2e tests for API integration validation. See [E2E Testing Documentation](./docs/e2e-testing.md) for more details.
+The project maintains focused test coverage with unit tests for detailed logic testing and API tests for integration validation.
 
 ## 📋 Development
 
 This project includes comprehensive development tools:
+
 - **Code Quality**: Biome for linting and formatting
 - **Type Safety**: TypeScript with strict configuration
 - **Pre-commit Hooks**: Husky with lint-staged for quality enforcement
@@ -111,4 +99,3 @@ This application helps fans engage with the event by creating betting pools, mak
 
 - [Official La Velada Website](https://www.infolavelada.com/)
 - [Watch on Twitch (Ibai)](https://twitch.tv/ibai)
-

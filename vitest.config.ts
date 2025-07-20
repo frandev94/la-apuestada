@@ -5,10 +5,8 @@ export default getViteConfig({
   test: {
     environment: 'jsdom',
     include: [
-      'test/**/*.test.ts'
-    ],
-    exclude: [
-      'test/e2e/**/*'
+      'test/**/*.test.ts',
+      'test/**/*.spec.ts'
     ],
     setupFiles: ['./test/setup.ts'],
     coverage: {
