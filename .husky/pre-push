@@ -21,8 +21,22 @@ restore_stash() {
     fi
 }
 
+# Run type checking
+echo "🔍 Running type checking..."
+npm run astro check
+
+# Capture type check exit code
+TYPE_CHECK_RESULT=$?
+
+if [ $TYPE_CHECK_RESULT -ne 0 ]; then
+    echo "❌ Type checking failed! Push aborted."
+    echo "� Fix the type errors before pushing."
+    restore_stash
+    exit 1
+fi
+
 # Run tests
-echo "🔍 Running test suite..."
+echo "🧪 Running test suite..."
 npm run test
 
 # Capture test exit code

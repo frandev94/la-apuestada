@@ -14,7 +14,8 @@
       "package.json",
       "biome.json",
       "tsconfig.json",
-      "astro.config.mjs"
+      "astro.config.mjs",
+      ".vscode/**/*"
     ],
     "ignore": []
   },
