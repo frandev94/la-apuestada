@@ -19,6 +19,11 @@ describe('API Utils - Pagination (Data-Driven Tests)', () => {
         expect(result.totalPages).toBe(expectedTotalPages);
       });
 
+      test(`should calculate correct page: ${page}`, () => {
+        const result = calculatePagination(totalUsers, limit, expectedOffset);
+        expect(result.page).toBe(page);
+      });
+
       test('should return correct pagination structure', () => {
         const result = calculatePagination(totalUsers, limit, expectedOffset);
         expect(result).toEqual({
@@ -32,25 +37,51 @@ describe('API Utils - Pagination (Data-Driven Tests)', () => {
     },
   );
   describe.each([
-    { input: '1', expected: 1, scenario: 'valid number string' },
-    { input: 'invalid', expected: 1, scenario: 'invalid string' },
-    { input: '0', expected: 1, scenario: 'zero value' },
-    { input: '-5', expected: 1, scenario: 'negative number' },
-    { input: '999', expected: 999, scenario: 'large valid number' },
-    { input: undefined, expected: 1, scenario: 'undefined value' },
+    { limit: 10, offset: 0, expectedPage: 1, scenario: 'first page' },
+    { limit: 10, offset: 10, expectedPage: 2, scenario: 'second page' },
+    { limit: 10, offset: 20, expectedPage: 3, scenario: 'third page' },
+    { limit: 5, offset: 15, expectedPage: 4, scenario: 'page 4 with limit 5' },
+    {
+      limit: 20,
+      offset: 100,
+      expectedPage: 6,
+      scenario: 'page 6 with limit 20',
+    },
   ])(
-    'parsePaginationParams page parsing - $scenario',
+    'parsePaginationParams page calculation - $scenario',
+    ({ limit, offset, expectedPage }) => {
+      test(`should calculate page ${expectedPage} from limit=${limit} and offset=${offset}`, () => {
+        const baseUrl = 'http://localhost:3000/api/users';
+        const url = new URL(baseUrl);
+        url.searchParams.set('limit', String(limit));
+        url.searchParams.set('offset', String(offset));
+
+        const result = parsePaginationParams(url);
+        expect(result.page).toBe(expectedPage);
+        expect(result.limit).toBe(limit);
+        expect(result.offset).toBe(offset);
+      });
+    },
+  );
+  describe.each([
+    { input: '0', expected: 0, scenario: 'valid zero offset' },
+    { input: '10', expected: 10, scenario: 'valid positive offset' },
+    { input: '100', expected: 100, scenario: 'valid large offset' },
+    { input: '-5', expected: 0, scenario: 'negative offset defaults to 0' },
+    { input: 'invalid', expected: 0, scenario: 'invalid string defaults to 0' },
+    { input: undefined, expected: 0, scenario: 'undefined defaults to 0' },
+  ])(
+    'parsePaginationParams offset parsing - $scenario',
     ({ input, expected }) => {
-      test(`should parse "${input}" as page ${expected}`, () => {
+      test(`should parse "${input}" as offset ${expected}`, () => {
         const baseUrl = 'http://localhost:3000/api/users';
         const url = new URL(baseUrl);
         if (input !== undefined) {
-          url.searchParams.set('limit', '10'); // Set consistent limit
-          url.searchParams.set('offset', String((expected - 1) * 10)); // Calculate offset from expected page
+          url.searchParams.set('offset', input);
         }
 
         const result = parsePaginationParams(url);
-        expect(result.page).toBe(expected);
+        expect(result.offset).toBe(expected);
       });
     },
   );

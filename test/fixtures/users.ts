@@ -46,7 +46,12 @@ export const mockUserRecords: MockUser[] = [
 ];
 
 export const mockSafeUserRecords: MockSafeUser[] = mockUserRecords.map(
-  ({ hashed_password, ...user }) => user,
+  (user): MockSafeUser => ({
+    id: user.id,
+    name: user.name,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  }),
 );
 
 export const paginationTestCases = [
