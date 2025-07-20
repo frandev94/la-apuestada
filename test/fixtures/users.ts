@@ -16,7 +16,12 @@ export const invalidUserData = {
   missingName: { password: 'password123' },
   missingPassword: { name: 'John Doe' },
   specialCharsName: {
-    name: 'John<script>alert("xss")</script>',
+    name: 'John<>Invalid&Chars',
+    password: 'password123',
+  },
+  // XSS test case - ONLY for controlled security testing
+  xssAttempt: {
+    name: 'User&lt;script&gt;alert(1)&lt;/script&gt;',
     password: 'password123',
   },
 } as const;
@@ -53,63 +58,3 @@ export const mockSafeUserRecords: MockSafeUser[] = mockUserRecords.map(
     updatedAt: user.updatedAt,
   }),
 );
-
-export const paginationTestCases = [
-  {
-    page: 1,
-    limit: 10,
-    totalUsers: 25,
-    expectedOffset: 0,
-    expectedTotalPages: 3,
-  },
-  {
-    page: 2,
-    limit: 10,
-    totalUsers: 25,
-    expectedOffset: 10,
-    expectedTotalPages: 3,
-  },
-  {
-    page: 3,
-    limit: 10,
-    totalUsers: 25,
-    expectedOffset: 20,
-    expectedTotalPages: 3,
-  },
-  {
-    page: 1,
-    limit: 5,
-    totalUsers: 12,
-    expectedOffset: 0,
-    expectedTotalPages: 3,
-  },
-  {
-    page: 1,
-    limit: 20,
-    totalUsers: 15,
-    expectedOffset: 0,
-    expectedTotalPages: 1,
-  },
-] as const;
-
-export const apiResponseFixtures = {
-  successResponse: {
-    success: true,
-    data: { message: 'Operation successful' },
-  },
-  errorResponse: {
-    success: false,
-    error: 'INTERNAL_ERROR',
-    message: 'Something went wrong',
-  },
-  validationErrorResponse: {
-    success: false,
-    error: 'VALIDATION_ERROR',
-    message: 'Validation failed',
-  },
-  notFoundResponse: {
-    success: false,
-    error: 'NOT_FOUND',
-    message: 'Resource not found',
-  },
-} as const;

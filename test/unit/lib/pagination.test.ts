@@ -3,7 +3,10 @@ import {
   calculatePagination,
   parsePaginationParams,
 } from '../../../src/lib/api';
-import { paginationTestCases } from '../../fixtures/users';
+import {
+  paginationTestCases,
+  parsePaginationTestCases,
+} from '../../fixtures/pagination';
 
 describe('API Utils - Pagination (Data-Driven Tests)', () => {
   describe.each(paginationTestCases)(
@@ -36,18 +39,7 @@ describe('API Utils - Pagination (Data-Driven Tests)', () => {
       });
     },
   );
-  describe.each([
-    { limit: 10, offset: 0, expectedPage: 1, scenario: 'first page' },
-    { limit: 10, offset: 10, expectedPage: 2, scenario: 'second page' },
-    { limit: 10, offset: 20, expectedPage: 3, scenario: 'third page' },
-    { limit: 5, offset: 15, expectedPage: 4, scenario: 'page 4 with limit 5' },
-    {
-      limit: 20,
-      offset: 100,
-      expectedPage: 6,
-      scenario: 'page 6 with limit 20',
-    },
-  ])(
+  describe.each(parsePaginationTestCases.pageCalculation)(
     'parsePaginationParams page calculation - $scenario',
     ({ limit, offset, expectedPage }) => {
       test(`should calculate page ${expectedPage} from limit=${limit} and offset=${offset}`, () => {
@@ -63,14 +55,7 @@ describe('API Utils - Pagination (Data-Driven Tests)', () => {
       });
     },
   );
-  describe.each([
-    { input: '0', expected: 0, scenario: 'valid zero offset' },
-    { input: '10', expected: 10, scenario: 'valid positive offset' },
-    { input: '100', expected: 100, scenario: 'valid large offset' },
-    { input: '-5', expected: 0, scenario: 'negative offset defaults to 0' },
-    { input: 'invalid', expected: 0, scenario: 'invalid string defaults to 0' },
-    { input: undefined, expected: 0, scenario: 'undefined defaults to 0' },
-  ])(
+  describe.each(parsePaginationTestCases.offsetParsing)(
     'parsePaginationParams offset parsing - $scenario',
     ({ input, expected }) => {
       test(`should parse "${input}" as offset ${expected}`, () => {
@@ -85,14 +70,7 @@ describe('API Utils - Pagination (Data-Driven Tests)', () => {
       });
     },
   );
-  describe.each([
-    { input: '10', expected: 10, scenario: 'valid limit' },
-    { input: '50', expected: 50, scenario: 'valid higher limit' },
-    { input: '101', expected: 100, scenario: 'limit over maximum' },
-    { input: '0', expected: 1, scenario: 'zero limit' },
-    { input: 'invalid', expected: 10, scenario: 'invalid string' },
-    { input: undefined, expected: 10, scenario: 'undefined value' },
-  ])(
+  describe.each(parsePaginationTestCases.limitParsing)(
     'parsePaginationParams limit parsing - $scenario',
     ({ input, expected }) => {
       test(`should parse "${input}" as limit ${expected}`, () => {

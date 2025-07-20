@@ -51,3 +51,25 @@ export const contentTypes = {
   TEXT: 'text/plain',
   HTML: 'text/html',
 } as const;
+
+export const apiResponseFixtures = {
+  successResponse: {
+    success: true,
+    data: { message: 'Operation successful' },
+  },
+  errorResponse: {
+    success: false,
+    error: 'INTERNAL_ERROR',
+    message: 'Something went wrong',
+  },
+  validationErrorResponse: {
+    success: false,
+    error: 'VALIDATION_ERROR',
+    message: 'Validation failed',
+  },
+  notFoundResponse: {
+    success: false,
+    error: 'NOT_FOUND',
+    message: 'Resource not found',
+  },
+} as const;

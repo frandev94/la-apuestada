@@ -9,8 +9,8 @@ import {
   validateRequired,
 } from '../../../src/lib/api';
 import type { ApiResponse, PaginationMeta } from '../../../src/lib/api.d';
+import { apiResponseFixtures } from '../../fixtures/api';
 import {
-  apiResponseFixtures,
   mockSafeUserRecords,
   mockUserRecords,
   validUserData,
