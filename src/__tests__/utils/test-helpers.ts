@@ -1,6 +1,6 @@
+import type { ApiResponse } from '@/lib/api.d';
 import type { APIContext } from 'astro';
 import { expect, vi } from 'vitest';
-import type { ApiResponse } from '../../src/lib/api.d';
 
 // Type definitions for better type safety
 export interface MockUser {

@@ -12,44 +12,55 @@ This document describes the test structure and organization for the La Apuestada
 ## 📁 Directory Structure
 
 ```text
-test/
+src/__tests__/
 ├── setup.ts                    # Global test setup and configuration
 ├── fixtures/                   # 🆕 Centralized test data management
-│   ├── users.ts                # User-related test fixtures and data
-│   └── api.ts                  # API endpoint test fixtures
-├── api/                        # API endpoint tests (mirrors src/pages/api/)
-│   └── *.test.ts               # Tests for API endpoints
-├── unit/                       # Unit tests (mirrors src/ structure)
-│   ├── data/                   # Tests for src/data/ modules
-│   │   └── *.test.ts           # Data layer tests
-│   └── lib/                    # Tests for src/lib/ modules
-│       └── *.test.ts           # Library function tests
+│   ├── *.ts                    # Domain-specific test fixtures
+│   └── ...                     # Additional fixture files as needed
 └── utils/                      # Test utilities and helpers
-    ├── test-helpers.ts         # Shared test utilities
-    └── custom-matchers.ts      # 🆕 Domain-specific test matchers
+    ├── custom-matchers.ts      # 🆕 Domain-specific test matchers
+    └── test-helpers.ts         # Shared test utilities
+
+src/                            # Test files co-located with source code
+├── components/
+│   ├── *.test.tsx              # Component tests
+│   └── **/                     # Nested component tests
+│       └── *.test.tsx          
+├── constants/
+│   └── *.test.ts               # Constants/data layer tests
+├── lib/
+│   └── *.test.ts               # Library function tests
+└── pages/api/
+    └── **/*.test.ts            # API endpoint tests (any depth)
 ```
 
 ## 🆕 New Testing Features
 
-### Test Fixtures (`test/fixtures/`)
+### Test Fixtures (`src/__tests__/fixtures/`)
 
 Centralized test data management for consistent and maintainable tests:
 
-- **`users.ts`**: User-related test data, including valid/invalid scenarios and pagination test cases
-- **`api.ts`**: API endpoint information and common HTTP status codes
+- **API fixtures**: HTTP status codes, endpoint definitions, and response templates
+- **Component fixtures**: Mock data for UI components and user interactions
+- **Data fixtures**: Test data for business entities and domain models
+- **Utility fixtures**: Common test scenarios and edge cases
 
 **Usage Example:**
 
 ```typescript
-import { validUserData, mockUserRecords, paginationTestCases } from '../fixtures/users';
+import {
+  mockData,
+  testScenarios,
+  validationCases,
+} from "../../__tests__/fixtures/[domain]";
 
-test('should create user with valid data', () => {
-  const result = createUser(validUserData);
+test("should handle valid input", () => {
+  const result = functionUnderTest(mockData.valid);
   expect(result).toBeDefined();
 });
 ```
 
-### Custom Matchers (`test/utils/custom-matchers.ts`)
+### Custom Matchers (`src/__tests__/utils/custom-matchers.ts`)
 
 Domain-specific assertions for improved test readability:
 
@@ -63,7 +74,7 @@ Domain-specific assertions for improved test readability:
 
 ```typescript
 expect(response).toBeSuccessfulApiResponse();
-expect(errorResponse).toBeErrorApiResponse('VALIDATION_ERROR');
+expect(errorResponse).toBeErrorApiResponse("VALIDATION_ERROR");
 expect(data).toHavePaginationStructure();
 expect(user).toBeValidUser();
 ```
@@ -73,56 +84,56 @@ expect(user).toBeValidUser();
 Parametrized testing for comprehensive coverage with minimal code duplication:
 
 ```typescript
-describe.each(paginationTestCases)(
-  'calculatePagination with page=$page, limit=$limit, totalUsers=$totalUsers',
-  ({ page, limit, totalUsers, expectedOffset, expectedTotalPages }) => {
-    test(`should calculate correct offset: ${expectedOffset}`, () => {
-      const result = calculatePagination(page, limit, totalUsers);
-      expect(result.offset).toBe(expectedOffset);
+describe.each(testScenarios)(
+  "functionality with $scenario",
+  ({ input, expected, description }) => {
+    test(`should ${description}`, () => {
+      const result = functionUnderTest(input);
+      expect(result).toBe(expected);
     });
-  }
+  },
 );
 ```
 
 ## 🧪 Test Categories
 
-### API Tests (`test/api/`)
+### API Tests (co-located with `src/pages/api/`)
 
-Tests for Astro API routes and endpoints that mirror the `src/pages/api/` structure.
+Tests for Astro API routes and endpoints that are co-located with their source files.
+
 - **Purpose**: Validate HTTP request/response handling, status codes, and JSON responses
 - **Scope**: Individual API endpoints and route handlers
-- **Structure**: Mirrors `src/pages/api/` directory structure
+- **Structure**: Test files are placed alongside their corresponding API files
 - **🆕 Enhanced**: Now uses custom matchers for cleaner assertions
 
-### Unit Tests (`test/unit/`)
+### Unit Tests (co-located with source files)
 
-Tests for individual functions, components, and utility modules that mirror the `src/` structure.
+Tests for individual functions, components, and utility modules that are co-located with their source files.
 
 - **Purpose**: Validate business logic, utilities, and helper functions in isolation
 - **Scope**: Single functions, classes, or small modules
-- **Structure**: Mirrors `src/` directory structure (`lib/`, `data/`, etc.)
+- **Structure**: Test files are placed alongside their corresponding source files
 - **🆕 Enhanced**: Includes data-driven tests and fixture-based testing
 
 ## 🗂️ File Organization Principles
 
-1. **Mirror source structure**: Test directories mirror the `src/` structure
-2. **Clear separation**: API tests and unit tests are clearly separated
-3. **Logical grouping**: Related tests are grouped in the same directory
+1. **Co-located testing**: Test files are placed alongside their corresponding source files
+2. **Clear naming**: Test files use `.test.ts` or `.test.tsx` extensions
+3. **Centralized utilities**: Test fixtures and utilities are centralized in `src/__tests__/`
 4. **Easy navigation**: Finding tests for a specific source file is intuitive
 
 ### Finding Tests for Source Files
 
-| Source File | Test Location |
-|-------------|---------------|
-| `src/lib/auth.ts` | `test/unit/lib/auth.test.ts` |
-| `src/lib/api.ts` | `test/unit/lib/api.test.ts` |
-| `src/data/participants.ts` | `test/unit/data/participants.test.ts` |
-| `src/pages/api/users/index.ts` | `test/api/users.test.ts` |
-| `src/pages/api/index.ts` | `test/api/index.test.ts` |
+| Source File Pattern            | Test Location Pattern                     |
+| ------------------------------- | ------------------------------------------ |
+| `src/lib/*.ts`                  | `src/lib/*.test.ts`                        |
+| `src/constants/*.ts`            | `src/constants/*.test.ts`                  |
+| `src/pages/api/**/*.ts`         | `src/pages/api/**/*.test.ts`               |
+| `src/components/*.tsx`          | `src/components/*.test.tsx`                |
 
 ## 🛠️ Test Utilities
 
-### `test/utils/test-helpers.ts`
+### `src/__tests__/utils/test-helpers.ts`
 
 Provides common utilities for testing across all test categories:
 
@@ -143,20 +154,20 @@ Use the `withSuppressedConsole()` utility when testing error scenarios:
 
 ```typescript
 // Suppress console output for a specific test that triggers known errors
-test('should handle database errors', async () => {
-  mockDb.from.mockRejectedValue(new Error('Database error'));
-  
+test("should handle database errors", async () => {
+  mockDb.from.mockRejectedValue(new Error("Database error"));
+
   const response = await withSuppressedConsole(async () => {
     return await getUsersHandler(context);
   });
-  
+
   expect(response.status).toBe(500);
 });
 
 // Or use the suppressConsole utility for more control
-test('with manual control', () => {
+test("with manual control", () => {
   const consoleSuppressor = suppressConsole();
-  
+
   try {
     // Code that would log errors
     someOperation();
@@ -180,7 +191,7 @@ npm test
 
 # Run specific test categories
 npm run test:api           # API tests only
-npm run test:unit          # Unit tests only  
+npm run test:unit          # Unit tests only
 
 # Run with coverage
 npm run test:coverage
@@ -191,10 +202,10 @@ npm run test:watch
 # Run tests with UI
 npm run test:ui            # Vitest UI
 
-# Run specific test file
-npx vitest run test/unit/lib/auth.test.ts     # Specific unit test
-npx vitest run test/api/users.test.ts         # Specific API test
-npx vitest run auth.test.ts                   # Run any test matching pattern
+# Run specific test files
+npx vitest run src/lib/           # All library tests
+npx vitest run src/components/    # All component tests
+npx vitest run **/*.test.ts       # All test files matching pattern
 ```
 
 ## 📝 Writing Tests
@@ -202,17 +213,19 @@ npx vitest run auth.test.ts                   # Run any test matching pattern
 ### API Tests Example
 
 ```typescript
-import { describe, expect, test, beforeEach, vi } from 'vitest';
-import { createMockAPIContext } from '../utils/test-helpers.js';
+import { describe, expect, test, beforeEach, vi } from "vitest";
+import { createMockAPIContext } from "../../__tests__/utils/test-helpers.js";
 
 // Mock external dependencies
-vi.mock('astro:db', () => ({ /* mock implementation */ }));
+vi.mock("astro:db", () => ({
+  /* mock implementation */
+}));
 
-describe('API Endpoint', () => {
-  test('should handle request correctly', async () => {
-    const request = new Request('http://localhost/api/test');
+describe("API Endpoint", () => {
+  test("should handle request correctly", async () => {
+    const request = new Request("http://localhost/api/endpoint");
     const context = createMockAPIContext(request);
-    
+
     // Test implementation
   });
 });
@@ -221,16 +234,16 @@ describe('API Endpoint', () => {
 ### Unit Tests Example
 
 ```typescript
-import { describe, expect, test } from 'vitest';
-import { functionToTest } from '../../../src/lib/module.js';
+import { describe, expect, test } from "vitest";
+import { functionToTest } from "./module.js"; // Co-located with test
 
-describe('Module Name', () => {
-  test('should handle valid input correctly', () => {
+describe("Module Name", () => {
+  test("should handle valid input correctly", () => {
     const result = functionToTest(validInput);
     expect(result).toBe(expectedOutput);
   });
-  
-  test('should handle edge cases', () => {
+
+  test("should handle edge cases", () => {
     expect(() => functionToTest(invalidInput)).toThrow();
   });
 });
@@ -245,7 +258,7 @@ describe('Module Name', () => {
 5. **Test both success and error cases**: Cover happy paths and edge cases
 6. **Keep tests focused**: One concept or behavior per test
 7. **Use meaningful assertions**: Test the right things, not just that code runs
-8. **Follow naming conventions**: 
+8. **Follow naming conventions**:
    - `*.test.ts` for unit and API tests
    - Descriptive test and describe block names
    - Group related tests logically
@@ -254,7 +267,7 @@ describe('Module Name', () => {
 ## 📊 Coverage Goals
 
 - **API endpoints**: 100% coverage for request/response handling
-- **Business logic & utilities**: 90%+ coverage for core functionality  
+- **Business logic & utilities**: 90%+ coverage for core functionality
 - **Error handling**: All error paths and edge cases tested
 
 ## 🔄 Test Maintenance
