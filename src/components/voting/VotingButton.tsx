@@ -8,7 +8,8 @@ export function VotingButton({
   theme,
   fighterName,
 }: VotingControlProps & ThemedComponentProps & { fighterName: string }) {
-  const { userHasVoted, userVotedFor, isVoting } = votingState;
+  const { userVotedFor, isVoting } = votingState;
+  const userHasVoted = userVotedFor !== null;
 
   const getButtonStyles = (): string => {
     if (userVotedFor === participantId) {

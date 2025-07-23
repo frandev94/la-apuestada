@@ -28,11 +28,3 @@ if (session) {
     </div>
   </main>
 </Layout>
-<script>
-  import { signIn } from "auth-astro/client";
-
-  const discord = document.getElementById("discord");
-  discord?.addEventListener("click", () => {
-    signIn("discord");
-  });
-</script>

@@ -1,10 +1,6 @@
 import { Vote, and, count, db, eq } from 'astro:db';
 import type { EventParticipantsName } from '../../constants/participants';
 
-// this code should not run in the browser
-if (typeof window !== 'undefined')
-  throw new Error('This code should not run in the browser');
-
 export type VoteInput = typeof Vote.$inferInsert & {
   participantId: EventParticipantsName;
 };
@@ -80,15 +76,16 @@ export async function getVotesByParticipantAndCombat(
 }
 
 /**
- * Gets a vote by user ID
+ * Gets a vote by user ID and combat ID
  */
 export async function getVoteByUser(
   userId: string,
+  combatId: number,
 ): Promise<VoteRecord | null> {
   const result = await db
     .select()
     .from(Vote)
-    .where(eq(Vote.userId, userId))
+    .where(and(eq(Vote.userId, userId), eq(Vote.combatId, combatId)))
     .limit(1);
   return result.length > 0 ? (result[0] as VoteRecord) : null;
 }

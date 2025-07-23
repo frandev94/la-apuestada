@@ -1,5 +1,4 @@
 import { FighterDisplay } from './FighterDisplay';
-import { VoteCountDisplay } from './VoteCountDisplay';
 import { VotingButton } from './VotingButton';
 import type { FighterContainerProps } from './types';
 

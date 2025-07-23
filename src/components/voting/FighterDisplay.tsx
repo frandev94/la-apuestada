@@ -10,7 +10,7 @@ export function FighterDisplay({ fighterData }: FighterDisplayProps) {
         <img
           src={fighter.avatar}
           alt={fighter.name}
-          className="w-40 h-60 rounded-full mx-auto mb-3 object-cover"
+          className="h-max rounded-b-full mx-auto mb-3 object-cover"
         />
       )}
       <h4 className="text-lg font-bold text-gray-800 mb-2">{fighter.name}</h4>

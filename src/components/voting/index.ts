@@ -13,4 +13,4 @@ export { VotingResults } from './VotingResults';
 export { createFighterData } from './fighterDataFactory';
 export { useVotingLogic } from './useVotingLogic';
 export { blueTheme, redTheme, greenTheme, purpleTheme } from './themes';
-export * from './types.d';
+export type * from './types.d';

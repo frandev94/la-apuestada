@@ -1,6 +1,9 @@
 export interface User {
   id: number;
   name: string;
+  email: string;
+  image: string | null;
+  isAdmin: boolean;
   hashed_password: string;
   createdAt: string;
   updatedAt: string;

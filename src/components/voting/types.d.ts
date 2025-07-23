@@ -1,24 +1,25 @@
+import type { Combat } from '@/constants/combats';
+import type { EventParticipantsName } from '@/constants/participants';
+
 // Domain interfaces (SRP: Single responsibility for data structure)
 export interface Participant {
-  id: string;
+  id: EventParticipantsName;
   name: string;
   avatar?: string;
 }
 
 export interface VotingState {
-  userHasVoted: boolean;
   userVotedFor: string | null;
   isVoting: boolean;
 }
 
 export interface FighterVoteData {
   fighter: Participant;
-  voteCount: number;
 }
 
 // Abstraction for voting actions (DIP: Depend on abstractions)
 export interface VotingActions {
-  onVote: (participantId: string) => void;
+  onVote: (participantId: EventParticipantsName) => void;
 }
 
 // Abstraction for UI theme (OCP: Open for extension)
@@ -35,7 +36,7 @@ export interface FighterDisplayProps {
 
 export interface VotingControlProps extends VotingActions {
   votingState: VotingState;
-  participantId: string;
+  participantId: EventParticipantsName;
 }
 
 export interface ThemedComponentProps {
@@ -57,11 +58,10 @@ export interface VoteResultDisplayProps {
 export interface FighterContainerProps {
   fighterData: FighterVoteData;
   votingState: VotingState;
-  onVote: (participantId: string) => void;
+  onVote: (participantId: EventParticipantsName) => void;
   theme: ThemeConfig;
 }
 
 export interface VotingCardProps {
-  combat: import('../../data/combats').Combat;
-  onVoteChange?: () => void;
+  combat: Combat;
 }

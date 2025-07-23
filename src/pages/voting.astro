@@ -1,8 +1,11 @@
 ---
+import { getUserFromRequest } from '@/lib/session';
 import { VotingPage } from '../components/voting/VotingPage';
 import Layout from '../layouts/Layout.astro';
+
+const user = await getUserFromRequest(Astro.request);
 ---
 
 <Layout>
-  <VotingPage client:load />
+  <VotingPage loggedUser={user} client:load />
 </Layout>

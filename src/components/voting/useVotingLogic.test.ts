@@ -40,7 +40,7 @@ describe('useVotingLogic', () => {
 
   it('should set default state if user not logged in', async () => {
     mockGetUserId.mockReturnValue(null);
-    const { result } = renderHook(() => useVotingLogic(mockCombat));
+    const { result } = renderHook(() => useVotingLogic({ combat: mockCombat }));
     await waitFor(() => {
       expect(result.current.fighter1VoteCount).toBe(0);
       expect(result.current.fighter2VoteCount).toBe(0);
@@ -55,7 +55,7 @@ describe('useVotingLogic', () => {
     mockGetParticipantVotes.mockResolvedValueOnce(3);
     mockHasUserVoted.mockResolvedValueOnce(true);
     mockGetUserVote.mockResolvedValueOnce({ participantId: 'peereira' });
-    const { result } = renderHook(() => useVotingLogic(mockCombat));
+    const { result } = renderHook(() => useVotingLogic({ combat: mockCombat }));
     await waitFor(() => {
       expect(result.current.fighter1VoteCount).toBe(5);
       expect(result.current.fighter2VoteCount).toBe(3);
@@ -72,7 +72,11 @@ describe('useVotingLogic', () => {
     mockSubmitVote.mockResolvedValue(true);
     const onVoteChange = vi.fn();
     const { result, rerender } = renderHook(
-      (props) => useVotingLogic(props.combat, props.onVoteChange),
+      (props) =>
+        useVotingLogic({
+          combat: props.combat,
+          onVoteChange: props.onVoteChange,
+        }),
       {
         initialProps: { combat: mockCombat, onVoteChange },
       },
@@ -93,7 +97,7 @@ describe('useVotingLogic', () => {
     mockHasUserVoted.mockResolvedValue(false);
     mockGetUserVote.mockResolvedValue({ participantId: null });
     mockSubmitVote.mockResolvedValue(false);
-    const { result } = renderHook(() => useVotingLogic(mockCombat));
+    const { result } = renderHook(() => useVotingLogic({ combat: mockCombat }));
     await waitFor(() => expect(result.current.fighter1VoteCount).toBe(0));
     await act(async () => {
       await result.current.handleVote('peereira');
@@ -105,7 +109,7 @@ describe('useVotingLogic', () => {
 
   it('should set error if user not logged in when voting', async () => {
     mockGetUserId.mockReturnValue(null);
-    const { result } = renderHook(() => useVotingLogic(mockCombat));
+    const { result } = renderHook(() => useVotingLogic({ combat: mockCombat }));
     await act(async () => {
       await result.current.handleVote('peereira');
     });

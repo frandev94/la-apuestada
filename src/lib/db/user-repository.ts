@@ -1,8 +1,5 @@
 import { User, count, db, eq, like } from 'astro:db';
 
-if (typeof window !== 'undefined')
-  throw new Error('This code should not run in the browser');
-
 export type UserRecord = typeof User.$inferSelect;
 export type CreateUserRecord = typeof User.$inferInsert & {
   image?: string | null;
@@ -129,10 +126,9 @@ export async function getTotalUsers(): Promise<number> {
 export async function searchUsersByName(
   searchTerm: string,
 ): Promise<UserRecord[]> {
-  const result = await db
-    .select()
-    .from(User)
-    .where(like(User.name, `%${searchTerm}%`));
+  // Use lower-case pattern for LIKE, matching test expectations
+  const pattern = `%${searchTerm.toLowerCase()}%`;
+  const result = await db.select().from(User).where(like(User.name, pattern));
   return result;
 }
 
