@@ -167,53 +167,49 @@ const isActive = (href: string) => {
   </div>
 </nav>
 
-<script>
-  // Mobile menu toggle functionality
-  document.addEventListener("DOMContentLoaded", () => {
-    const mobileMenuButton = document.querySelector(".mobile-menu-button");
-    const mobileMenu = document.querySelector(".mobile-menu");
-    const menuIcons = mobileMenuButton?.querySelectorAll("svg");
-
-    mobileMenuButton?.addEventListener("click", () => {
-      const isExpanded =
-        mobileMenuButton.getAttribute("aria-expanded") === "true";
-
-      // Toggle menu visibility
-      mobileMenu?.classList.toggle("hidden");
-
-      // Update button state
-      mobileMenuButton.setAttribute("aria-expanded", (!isExpanded).toString());
-
-      // Toggle icons
-      menuIcons?.forEach((icon, index) => {
-        if (index === 0) {
-          // Menu icon
-          icon.classList.toggle("hidden", !isExpanded);
-          icon.classList.toggle("block", isExpanded);
-        } else {
-          // Close icon
-          icon.classList.toggle("hidden", isExpanded);
-          icon.classList.toggle("block", !isExpanded);
-        }
-      });
-    });
-
-    // Sign out functionality
-    const desktopSignout = document.getElementById("desktop-signout");
-    const mobileSignout = document.getElementById("mobile-signout");
-
-    async function handleSignout() {
-      try {
-        const { signOut } = await import("auth-astro/client");
-        await signOut();
-      } catch (error) {
-        console.error("Sign out error:", error);
-      }
+<script is:inline>
+  function setupNavbar() {
+    // Mobile menu toggle
+    const menuButton = document.querySelector('.mobile-menu-button');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    
+    if (menuButton && mobileMenu) {
+      menuButton.onclick = () => {
+        const isOpen = !mobileMenu.classList.contains('hidden');
+        mobileMenu.classList.toggle('hidden');
+        menuButton.setAttribute('aria-expanded', (!isOpen).toString());
+        
+        // Toggle icons
+        const [menuIcon, closeIcon] = menuButton.querySelectorAll('svg');
+        menuIcon.classList.toggle('hidden', !isOpen);
+        closeIcon.classList.toggle('hidden', isOpen);
+      };
     }
 
-    desktopSignout?.addEventListener("click", handleSignout);
-    mobileSignout?.addEventListener("click", handleSignout);
-  });
+    // Sign out buttons
+    document.querySelectorAll('#desktop-signout, #mobile-signout').forEach(btn => {
+      if (btn) {
+        btn.onclick = async () => {
+          try {
+            const { signOut } = await import('auth-astro/client');
+            await signOut();
+          } catch (error) {
+            console.error('Sign out error:', error);
+          }
+        };
+      }
+    });
+  }
+
+  // Initialize
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupNavbar);
+  } else {
+    setupNavbar();
+  }
+
+  // Re-initialize on Astro navigation
+  document.addEventListener('astro:page-load', setupNavbar);
 </script>
 
 <style>
