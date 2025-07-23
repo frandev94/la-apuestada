@@ -69,6 +69,9 @@ describe('Users API Endpoints', () => {
     expect(data.success).toBe(true);
     expect(data.data?.users).toHaveLength(3);
     expect(data.data?.users[0]).not.toHaveProperty('hashed_password');
+    expect(data.data?.users[0]).toHaveProperty('email');
+    expect(data.data?.users[0]).toHaveProperty('image');
+    expect(data.data?.users[0]).toHaveProperty('isAdmin');
     expect(data.data?.pagination.total).toBe(3);
   });
 
@@ -141,7 +144,7 @@ describe('Users API Endpoints', () => {
   describe('GET /api/users/[id]', () => {
     test('should return user by ID', async () => {
       const targetUser = mockUsers[0];
-      mockDb.where.mockResolvedValue([targetUser]);
+      mockDb.where.mockResolvedValue([targetUser]); // Return as array
 
       const context = createMockAPIContext(
         new Request('http://localhost/api/users/1'),
@@ -152,10 +155,10 @@ describe('Users API Endpoints', () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(data.data?.user.id).toBe(1);
-      expect(data.data?.user.name).toBe('Alice Smith');
+      expect(data.data?.user.id).toBe(targetUser.id);
+      expect(data.data?.user.name).toBe(targetUser.name);
       expect(data.data?.user).not.toHaveProperty('hashed_password');
-      expect(mockEq).toHaveBeenCalledWith(mockUser.id, 1);
+      expect(mockEq).toHaveBeenCalledWith(mockUser.id, targetUser.id);
     });
 
     test('should return 404 when user does not exist', async () => {

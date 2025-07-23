@@ -1,3 +1,4 @@
+import { getAllUsers } from '@/lib/db/user-repository';
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async ({ request }) => {
@@ -13,10 +14,23 @@ export const GET: APIRoute = async ({ request }) => {
     );
     const name = url.searchParams.get('name');
 
+    // Fetch users from DB
+    let users = await getAllUsers();
+    if (name && users) {
+      users = users.filter((user) =>
+        user.name?.toLowerCase().includes(name.toLowerCase()),
+      );
+    }
+    const totalCount = users.length;
+    const pagedUsers = users.slice(offset, offset + limit);
+
     // Remove sensitive information from response
-    const safeUsers: SafeUser[] = users.map((user: UserRow) => ({
+    const safeUsers = pagedUsers.map((user) => ({
       id: user.id,
       name: user.name,
+      email: user.email,
+      image: user.image,
+      isAdmin: user.isAdmin,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     }));

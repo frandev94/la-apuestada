@@ -102,7 +102,7 @@ expect.extend({
       received !== undefined &&
       typeof received === 'object' &&
       'id' in received &&
-      typeof received.id === 'number' &&
+      (typeof received.id === 'number' || typeof received.id === 'string') &&
       'name' in received &&
       typeof received.name === 'string' &&
       received.name.length > 0 &&
@@ -111,6 +111,7 @@ expect.extend({
       !('hashed_password' in received) && // Should not expose password
       !('password' in received);
 
+    // Optionally, allow for email and other fields, but do not require them
     return {
       pass,
       message: () =>

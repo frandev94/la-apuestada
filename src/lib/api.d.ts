@@ -1,13 +1,6 @@
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  image: string | null;
-  isAdmin: boolean;
-  hashed_password: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { UserRecord } from './db/user-repository';
+
+export type User = UserRecord;
 
 /**
  * Standard API response interface

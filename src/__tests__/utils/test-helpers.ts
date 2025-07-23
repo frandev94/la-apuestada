@@ -1,15 +1,10 @@
 import type { ApiResponse } from '@/lib/api.d';
+import type { UserRecord } from '@/lib/db/user-repository';
 import type { APIContext } from 'astro';
 import { expect, vi } from 'vitest';
 
 // Type definitions for better type safety
-export interface MockUser {
-  id: number;
-  name: string;
-  hashed_password: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type MockUser = UserRecord;
 
 export interface MockSafeUser {
   id: number;
@@ -81,9 +76,11 @@ export const withSuppressedConsole = async <T>(
 /**
  * Creates a mock APIContext for testing Astro API routes
  */
-export const createMockAPIContext = (
+export const createMockAPIContext = <
+  T extends Record<string, unknown> = Record<string, string>,
+>(
   request: Request,
-  params: Record<string, string> = {},
+  params: T = {} as T,
 ): APIContext => {
   const url = new URL(request.url);
   return {
@@ -145,34 +142,43 @@ export const createMockDatabase = (): MockDbUtils => {
  */
 export const mockUsers: MockUser[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Alice Smith',
-    hashed_password: 'hashed_password1',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
+    email: 'alice@example.com',
+    image: 'https://example.com/alice.png',
+    isAdmin: false,
+    createdAt: new Date('2024-01-01T00:00:00Z'),
+    updatedAt: new Date('2024-01-01T00:00:00Z'),
   },
   {
-    id: 2,
+    id: '2',
     name: 'Bob Johnson',
-    hashed_password: 'hashed_password2',
-    createdAt: '2024-01-02T00:00:00Z',
-    updatedAt: '2024-01-02T00:00:00Z',
+    email: 'bob@example.com',
+    image: 'https://example.com/bob.png',
+    isAdmin: true,
+    createdAt: new Date('2024-01-02T00:00:00Z'),
+    updatedAt: new Date('2024-01-02T00:00:00Z'),
   },
   {
-    id: 3,
+    id: '3',
     name: 'Alice Brown',
-    hashed_password: 'hashed_password3',
-    createdAt: '2024-01-03T00:00:00Z',
-    updatedAt: '2024-01-03T00:00:00Z',
+    email: 'alice.brown@example.com',
+    image: null,
+    isAdmin: false,
+    createdAt: new Date('2024-01-03T00:00:00Z'),
+    updatedAt: new Date('2024-01-03T00:00:00Z'),
   },
 ];
 
 /**
  * Safe user data (without password)
  */
-export const mockSafeUsers: MockSafeUser[] = mockUsers.map(
-  ({ hashed_password, ...user }) => user,
-);
+export const mockSafeUsers: MockSafeUser[] = mockUsers.map((user) => ({
+  ...user,
+  id: Number(user.id),
+  createdAt: user.createdAt.toISOString(),
+  updatedAt: user.updatedAt.toISOString(),
+}));
 
 /**
  * Helper to create mock HTTP responses
@@ -229,11 +235,13 @@ export const createTypedMock = <
  */
 export const createMockUser = (overrides: Partial<MockUser> = {}): MockUser => {
   return {
-    id: 1,
+    id: '1',
     name: 'Test User',
-    hashed_password: 'hashed_password',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
+    email: 'test.user@example.com',
+    image: null,
+    isAdmin: false,
+    createdAt: new Date('2024-01-01T00:00:00Z'),
+    updatedAt: new Date('2024-01-01T00:00:00Z'),
     ...overrides,
   };
 };
@@ -246,7 +254,11 @@ export const createMockUsers = (
   baseUser: Partial<MockUser> = {},
 ): MockUser[] => {
   return Array.from({ length: count }, (_, index) =>
-    createMockUser({ id: index + 1, name: `User ${index + 1}`, ...baseUser }),
+    createMockUser({
+      id: String(index + 1),
+      name: `User ${index + 1}`,
+      ...baseUser,
+    }),
   );
 };
 

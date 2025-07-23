@@ -1,43 +1,31 @@
-import { User, db, eq } from 'astro:db';
+import { z } from 'astro:schema';
+import { createErrorResponse, createSuccessResponse } from '@/lib/api';
+import { getUserById } from '@/lib/db/user-repository';
 import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = async ({ params }) => {
-  try {
-    const userId = params.id;
+const paramsSchema = z.object({
+  id: z.string().uuid('Invalid user ID format'),
+});
 
-    if (Number.isNaN(userId)) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: 'Invalid user ID',
-          message: 'User ID must be a valid number',
-        }),
-        {
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-    }
+type GetApiRoute = APIRoute<
+  Record<string, unknown>,
+  z.infer<typeof paramsSchema>
+>;
+
+export const GET: GetApiRoute = async ({ params }) => {
+  try {
+    // Validate params
+    const parsedParams = paramsSchema.parse(params);
+    const userId = parsedParams.id;
 
     // Find the user by ID
-    const users = await db.select().from(User).where(eq(User.id, userId));
-    const user = users[0];
+    const user = await getUserById(userId);
 
     if (!user) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: 'User not found',
-          message: `No user found with ID ${userId}`,
-        }),
-        {
-          status: 404,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
+      return createErrorResponse(
+        'User not found',
+        `No user found with ID ${userId}`,
+        404,
       );
     }
 
@@ -45,38 +33,19 @@ export const GET: APIRoute = async ({ params }) => {
     const safeUser = {
       id: user.id,
       name: user.name,
+      email: user.email,
+      image: user.image,
+      isAdmin: user.isAdmin,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        data: {
-          user: safeUser,
-        },
-      }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
+    return createSuccessResponse({ data: { user: safeUser } });
   } catch (error) {
-    console.error('Error fetching user:', error);
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: 'Internal server error',
-        message: 'Failed to fetch user',
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
+    return createErrorResponse(
+      'Internal server error',
+      'Failed to fetch user',
+      500,
     );
   }
 };

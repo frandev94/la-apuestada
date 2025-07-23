@@ -3,10 +3,15 @@ import type { ApiResponse, PaginationMeta, User } from './api.d';
 /**
  * Create a success API response
  */
-export function createSuccessResponse<T>(data: T, status = 200): Response {
+export function createSuccessResponse<T>({
+  data,
+  message,
+  status = 200,
+}: { data: T; message?: string; status?: number }): Response {
   return new Response(
     JSON.stringify({
       success: true,
+      message,
       data,
     } as ApiResponse<T>),
     {
@@ -116,11 +121,18 @@ export function validateRequired<T>(params: Record<string, T>): string[] {
 }
 
 /**
- * Sanitize user object by removing sensitive fields
+ * Sanitize user object by returning only allowed User fields
  */
 export function sanitizeUser(user: User) {
-  const { hashed_password, ...safeUser } = user;
-  return safeUser;
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    image: user.image ?? null,
+    isAdmin: user.isAdmin ?? false,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
 }
 
 /**

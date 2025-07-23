@@ -20,7 +20,7 @@ import type { ApiResponse, PaginationMeta } from './api.d';
 describe('API libs', () => {
   describe('createSuccessResponse', () => {
     it('should create a success response with default status 200', async () => {
-      const response = createSuccessResponse(validUserData);
+      const response = createSuccessResponse({ data: validUserData });
 
       expect(response.status).toBe(200);
       expect(response.headers.get('Content-Type')).toBe('application/json');
@@ -31,10 +31,10 @@ describe('API libs', () => {
     });
 
     it('should create a success response with custom status', async () => {
-      const response = createSuccessResponse(
-        apiResponseFixtures.successResponse.data,
-        201,
-      );
+      const response = createSuccessResponse({
+        data: apiResponseFixtures.successResponse.data,
+        status: 201,
+      });
 
       expect(response.status).toBe(201);
 
@@ -44,9 +44,9 @@ describe('API libs', () => {
     });
 
     it('should create proper JSON body with fixture data', async () => {
-      const response = createSuccessResponse(
-        apiResponseFixtures.successResponse.data,
-      );
+      const response = createSuccessResponse({
+        data: apiResponseFixtures.successResponse.data,
+      });
       const body: ApiResponse<typeof apiResponseFixtures.successResponse.data> =
         await response.json();
 
@@ -337,27 +337,49 @@ describe('API libs', () => {
   describe('sanitizeUser', () => {
     it('should remove hashed_password from user object', () => {
       const user = mockUserRecords[0];
-      const expectedSanitized = mockSafeUserRecords[0];
+      const expectedSanitized = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image ?? null,
+        isAdmin: user.isAdmin ?? false,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
       const sanitized = sanitizeUser(user);
-
       expect(sanitized).toBeValidUser();
-      expect(sanitized).not.toHaveProperty('hashed_password');
       expect(sanitized).toEqual(expectedSanitized);
     });
 
     it('should preserve all other user properties', () => {
       const user = mockUserRecords[1];
-      const expectedSanitized = mockSafeUserRecords[1];
+      const expectedSanitized = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image ?? null,
+        isAdmin: user.isAdmin ?? false,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
       const sanitized = sanitizeUser(user);
-
       expect(sanitized).toBeValidUser();
       expect(sanitized).toEqual(expectedSanitized);
     });
 
     it('should work with multiple users', () => {
       const sanitizedUsers = mockUserRecords.map(sanitizeUser);
+      const expectedSanitizedUsers = mockUserRecords.map((user) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image ?? null,
+        isAdmin: user.isAdmin ?? false,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      }));
       expect(sanitizedUsers).toBeValidUserList();
-      expect(sanitizedUsers).toEqual(mockSafeUserRecords);
+      expect(sanitizedUsers).toEqual(expectedSanitizedUsers);
     });
   });
 
