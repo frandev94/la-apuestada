@@ -30,6 +30,7 @@ vi.mock('astro:db', () => {
 
 import { User, db, eq, like } from 'astro:db';
 import type { ApiResponse, User as IUser } from '@/lib/api.d';
+import { generateUUID } from '@/lib/crypto.ts';
 import { GET as getUserByIdHandler } from './[id].ts';
 import { GET as getUsersHandler } from './index.ts';
 
@@ -89,14 +90,16 @@ describe('Users API Endpoints', () => {
       const request = new Request('http://localhost/api/users?name=Alice');
       const context = createMockAPIContext(request);
       const response = await getUsersHandler(context);
-      const data: ApiResponse<{ users: IUser[] }> = await response.json();
+      const { data, success, error, message }: ApiResponse<{ users: IUser[] }> =
+        await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.success).toBe(true);
-      expect(data.data?.users).toHaveLength(2);
-      expect(
-        data.data?.users.every((user: IUser) => user.name.includes('Alice')),
-      ).toBe(true);
+      expect(success).toBe(true);
+      expect(data?.users).toHaveLength(2);
+      expect(data?.users.at(0)).toHaveProperty('name', filteredUsers[0].name);
+      expect(data?.users.at(1)).toHaveProperty('name', filteredUsers[1].name);
+      expect(error).toBeUndefined();
+      expect(message).toBeUndefined();
       expect(mockLike).toHaveBeenCalledWith(mockUser.name, '%alice%');
     });
 
@@ -144,11 +147,11 @@ describe('Users API Endpoints', () => {
   describe('GET /api/users/[id]', () => {
     test('should return user by ID', async () => {
       const targetUser = mockUsers[0];
-      mockDb.where.mockResolvedValue([targetUser]); // Return as array
+      mockDb.limit.mockResolvedValueOnce([targetUser]);
 
       const context = createMockAPIContext(
-        new Request('http://localhost/api/users/1'),
-        { id: '1' },
+        new Request(`http://localhost/api/users/${targetUser.id}`),
+        { id: targetUser.id },
       );
       const response = await getUserByIdHandler(context);
       const data: ApiResponse<{ user: IUser }> = await response.json();
@@ -162,11 +165,11 @@ describe('Users API Endpoints', () => {
     });
 
     test('should return 404 when user does not exist', async () => {
-      mockDb.where.mockResolvedValue([]);
+      mockDb.limit.mockResolvedValue([]);
 
       const context = createMockAPIContext(
         new Request('http://localhost/api/users/999'),
-        { id: '999' },
+        { id: generateUUID() },
       );
       const response = await getUserByIdHandler(context);
       const data: ApiResponse = await response.json();
@@ -174,7 +177,7 @@ describe('Users API Endpoints', () => {
       expect(response.status).toBe(404);
       expect(data.success).toBe(false);
       expect(data.error).toBe('User not found');
-      expect(data.message).toBe('No user found with ID 999');
+      expect(data.message).toBe(`No user found with ID ${context.params.id}`);
     });
 
     test('should return 400 for invalid user ID', async () => {
@@ -188,15 +191,15 @@ describe('Users API Endpoints', () => {
       expect(response.status).toBe(400);
       expect(data.success).toBe(false);
       expect(data.error).toBe('Invalid user ID');
-      expect(data.message).toBe('User ID must be a valid number');
+      expect(data.message).toBe('Invalid uuid');
     });
 
     test('should handle database errors', async () => {
-      mockDb.where.mockRejectedValue(new Error('Database error'));
+      mockDb.limit.mockRejectedValue(new Error('Database error'));
 
       const context = createMockAPIContext(
         new Request('http://localhost/api/users/1'),
-        { id: '1' },
+        { id: generateUUID() },
       );
 
       // Suppress console output for this known error test

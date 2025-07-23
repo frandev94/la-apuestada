@@ -1,4 +1,9 @@
-import { getAllUsers } from '@/lib/db/user-repository';
+import { createErrorResponse, createSuccessResponse } from '@/lib/api';
+import {
+  type UserRecord,
+  getAllUsers,
+  searchUsersByName,
+} from '@/lib/db/user-repository';
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async ({ request }) => {
@@ -15,12 +20,13 @@ export const GET: APIRoute = async ({ request }) => {
     const name = url.searchParams.get('name');
 
     // Fetch users from DB
-    let users = await getAllUsers();
-    if (name && users) {
-      users = users.filter((user) =>
-        user.name?.toLowerCase().includes(name.toLowerCase()),
-      );
+    let users: UserRecord[];
+    if (name) {
+      users = await searchUsersByName(name);
+    } else {
+      users = await getAllUsers();
     }
+
     const totalCount = users.length;
     const pagedUsers = users.slice(offset, offset + limit);
 
@@ -44,35 +50,19 @@ export const GET: APIRoute = async ({ request }) => {
       totalPages: Math.ceil(totalCount / limit),
     };
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        data: {
-          users: safeUsers,
-          pagination,
-        },
-      }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    return createSuccessResponse({
+      status: 200,
+      data: {
+        users: safeUsers,
+        pagination,
       },
-    );
+    });
   } catch (error) {
     console.error('Error fetching users:', error);
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: 'Internal server error',
-        message: 'Failed to fetch users',
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
+    return createErrorResponse({
+      error: 'Internal server error',
+      message: (error as Error).message,
+      status: 500,
+    });
   }
 };

@@ -16,7 +16,9 @@ export function VotingPage({ className = '', loggedUser }: VotingPageProps) {
         'Are you sure you want to reset all votes? This action cannot be undone.',
       )
     ) {
-      actions.voteActions.clearVotes({ confirm: true });
+      actions.voteActions.clearVotes({ confirm: true }).then(() => {
+        window.location.reload();
+      });
     }
   };
 

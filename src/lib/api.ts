@@ -26,11 +26,11 @@ export function createSuccessResponse<T>({
 /**
  * Create an error API response
  */
-export function createErrorResponse(
-  error: string,
-  message: string,
+export function createErrorResponse({
+  error,
+  message,
   status = 500,
-): Response {
+}: { error: string; message: string; status?: number }): Response {
   return new Response(
     JSON.stringify({
       success: false,

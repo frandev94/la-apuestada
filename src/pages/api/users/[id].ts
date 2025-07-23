@@ -4,7 +4,7 @@ import { getUserById } from '@/lib/db/user-repository';
 import type { APIRoute } from 'astro';
 
 const paramsSchema = z.object({
-  id: z.string().uuid('Invalid user ID format'),
+  id: z.string().uuid(),
 });
 
 type GetApiRoute = APIRoute<
@@ -22,11 +22,11 @@ export const GET: GetApiRoute = async ({ params }) => {
     const user = await getUserById(userId);
 
     if (!user) {
-      return createErrorResponse(
-        'User not found',
-        `No user found with ID ${userId}`,
-        404,
-      );
+      return createErrorResponse({
+        error: 'User not found',
+        message: `No user found with ID ${userId}`,
+        status: 404,
+      });
     }
 
     // Return user without sensitive information
@@ -42,10 +42,18 @@ export const GET: GetApiRoute = async ({ params }) => {
 
     return createSuccessResponse({ data: { user: safeUser } });
   } catch (error) {
-    return createErrorResponse(
-      'Internal server error',
-      'Failed to fetch user',
-      500,
-    );
+    if (error instanceof z.ZodError) {
+      return createErrorResponse({
+        error: 'Invalid user ID',
+        message: error.errors.map((e) => e.message).join(', '),
+        status: 400,
+      });
+    }
+    console.error('Error fetching user:', error);
+    return createErrorResponse({
+      error: 'Internal server error',
+      message: 'Failed to fetch user',
+      status: 500,
+    });
   }
 };

@@ -58,7 +58,7 @@ describe('API libs', () => {
   describe('createErrorResponse', () => {
     it('should create validation error response using fixtures', async () => {
       const { error, message } = apiResponseFixtures.validationErrorResponse;
-      const response = createErrorResponse(error, message, 400);
+      const response = createErrorResponse({ error, message, status: 400 });
       const json: ApiResponse = await response.json();
 
       expect(response.status).toBe(400);
@@ -69,7 +69,7 @@ describe('API libs', () => {
 
     it('should create not found error response using fixtures', async () => {
       const { error, message } = apiResponseFixtures.notFoundResponse;
-      const response = createErrorResponse(error, message, 404);
+      const response = createErrorResponse({ error, message, status: 404 });
       const json: ApiResponse = await response.json();
 
       expect(response.status).toBe(404);
@@ -79,7 +79,7 @@ describe('API libs', () => {
 
     it('should create internal error response using fixtures', async () => {
       const { error, message } = apiResponseFixtures.errorResponse;
-      const response = createErrorResponse(error, message, 500);
+      const response = createErrorResponse({ error, message, status: 500 });
       const body: ApiResponse = await response.json();
 
       expect(response.status).toBe(500);

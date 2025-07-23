@@ -1,7 +1,7 @@
 import { actions } from 'astro:actions';
 import type { Combat } from '@/constants/combats';
 import type { EventParticipantsName } from '@/constants/participants';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { VotingState } from './types';
 
 type UseVotingLogicProps = {
@@ -18,6 +18,11 @@ export function useVotingLogic({ combat, userId }: UseVotingLogicProps) {
   });
   const [error, setError] = useState<string | null>(null);
 
+  const votingStateRef = useRef<VotingState>(votingState);
+  useEffect(() => {
+    votingStateRef.current = votingState;
+  }, [votingState]);
+
   useEffect(() => {
     // retrieve vote state for the combat
     actions.voteActions
@@ -30,35 +35,40 @@ export function useVotingLogic({ combat, userId }: UseVotingLogicProps) {
       });
   }, [combat]);
 
-  const handleVote = (participantId: EventParticipantsName) => {
+  const handleVote = async (participantId: EventParticipantsName) => {
     if (!userId) {
       setError('Please log in to vote');
       return;
     }
 
-    if (votingState.userVotedFor || votingState.isVoting) return;
+    // Always fetch the latest vote state before allowing voting
+    const latestVote = await actions.voteActions.getVoteState({
+      combatId: combat.id,
+    });
+    if (latestVote?.data?.participantId || votingState.isVoting) {
+      return;
+    }
 
     setVotingState((prev) => ({ ...prev, isVoting: true }));
     setError(null);
-    castVote({
-      combatId: combat.id,
-      participantId,
-    })
-      .then(({ data }) => {
-        if (!data?.id) {
-          return setError('Failed to submit vote');
-        }
-        setVotingState((prev) => ({
-          ...prev,
-          userVotedFor: participantId,
-        }));
-      })
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : 'Failed to cast vote');
-      })
-      .finally(() => {
-        setVotingState((prev) => ({ ...prev, isVoting: false }));
+    try {
+      const { data } = await castVote({
+        combatId: combat.id,
+        participantId,
       });
+      if (!data?.id) {
+        setError('Failed to submit vote');
+        return;
+      }
+      setVotingState((prev) => ({
+        ...prev,
+        userVotedFor: participantId,
+      }));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to cast vote');
+    } finally {
+      setVotingState((prev) => ({ ...prev, isVoting: false }));
+    }
   };
 
   return {

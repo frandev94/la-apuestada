@@ -1,4 +1,5 @@
 import type { ApiResponse } from '@/lib/api.d';
+import { generateUUID } from '@/lib/crypto';
 import type { UserRecord } from '@/lib/db/user-repository';
 import type { APIContext } from 'astro';
 import { expect, vi } from 'vitest';
@@ -6,12 +7,7 @@ import { expect, vi } from 'vitest';
 // Type definitions for better type safety
 export type MockUser = UserRecord;
 
-export interface MockSafeUser {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type MockSafeUser = Omit<MockUser, 'image' | 'isAdmin' | 'email'>;
 
 export interface MockDatabase {
   select: ReturnType<typeof vi.fn>;
@@ -81,7 +77,7 @@ export const createMockAPIContext = <
 >(
   request: Request,
   params: T = {} as T,
-): APIContext => {
+): APIContext & { params: T } => {
   const url = new URL(request.url);
   return {
     request,
@@ -110,7 +106,7 @@ export const createMockAPIContext = <
     routePattern: '/api/test',
     originPathname: '/api/test',
     isPrerendered: false,
-  } as unknown as APIContext;
+  } as unknown as APIContext & { params: T };
 };
 
 /**
@@ -142,7 +138,7 @@ export const createMockDatabase = (): MockDbUtils => {
  */
 export const mockUsers: MockUser[] = [
   {
-    id: '1',
+    id: generateUUID(),
     name: 'Alice Smith',
     email: 'alice@example.com',
     image: 'https://example.com/alice.png',
@@ -151,7 +147,7 @@ export const mockUsers: MockUser[] = [
     updatedAt: new Date('2024-01-01T00:00:00Z'),
   },
   {
-    id: '2',
+    id: generateUUID(),
     name: 'Bob Johnson',
     email: 'bob@example.com',
     image: 'https://example.com/bob.png',
@@ -160,7 +156,7 @@ export const mockUsers: MockUser[] = [
     updatedAt: new Date('2024-01-02T00:00:00Z'),
   },
   {
-    id: '3',
+    id: generateUUID(),
     name: 'Alice Brown',
     email: 'alice.brown@example.com',
     image: null,
@@ -174,10 +170,10 @@ export const mockUsers: MockUser[] = [
  * Safe user data (without password)
  */
 export const mockSafeUsers: MockSafeUser[] = mockUsers.map((user) => ({
-  ...user,
-  id: Number(user.id),
-  createdAt: user.createdAt.toISOString(),
-  updatedAt: user.updatedAt.toISOString(),
+  id: user.id,
+  name: user.name,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
 }));
 
 /**
