@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async ({ params }) => {
   try {
-    const userId = Number.parseInt(params.id as string, 10);
+    const userId = params.id;
 
     if (Number.isNaN(userId)) {
       return new Response(

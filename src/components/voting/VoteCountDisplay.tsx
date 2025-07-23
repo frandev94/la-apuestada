@@ -1,0 +1,20 @@
+import type { FighterDisplayProps, ThemedComponentProps } from './types';
+
+// SRP: Component responsible only for vote count display
+export function VoteCountDisplay({
+  fighterData,
+  theme,
+}: FighterDisplayProps & ThemedComponentProps) {
+  const { voteCount } = fighterData;
+
+  return (
+    <div className="mb-3">
+      <span className={`text-xl font-semibold ${theme.voteCountColor}`}>
+        {voteCount}
+      </span>
+      <span className="text-gray-600 ml-1 text-sm">
+        {voteCount === 1 ? 'vote' : 'votes'}
+      </span>
+    </div>
+  );
+}

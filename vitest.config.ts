@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 import { getViteConfig } from 'astro/config';
 
+
 export default getViteConfig({
   test: {
     environment: 'jsdom',
@@ -14,6 +15,7 @@ export default getViteConfig({
       reporter: ['text', 'json', 'html'],
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
+        'src/**/__tests__/**',
         'src/**/*.d.ts',
         'src/**/*.test.{ts,tsx}',
         'src/**/*.spec.{ts,tsx}',

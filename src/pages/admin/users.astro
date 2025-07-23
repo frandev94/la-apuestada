@@ -1,0 +1,91 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getAllUsers } from '@/lib/db/user-repository';
+
+const users = await getAllUsers();
+---
+
+<Layout>
+  <main
+    class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"
+  >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h1
+        class="text-4xl md:text-5xl font-bold text-white mb-10 text-center tracking-tight"
+      >
+        Users
+      </h1>
+      <div
+        class="overflow-x-auto rounded-2xl shadow-xl bg-white/10 backdrop-blur-lg border border-white/20"
+      >
+        <table class="min-w-full divide-y divide-white/20">
+          <thead class="bg-white/10">
+            <tr>
+              <th
+                class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                >Image</th
+              >
+              <th
+                class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                >ID</th
+              >
+              <th
+                class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                >Name</th
+              >
+              <th
+                class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                >Email</th
+              >
+              <th
+                class="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                >Admin</th
+              >
+            </tr>
+          </thead>
+          <tbody class="bg-white/5 divide-y divide-white/10">
+            {
+              users.map((user) => (
+                <tr class="hover:bg-white/10 transition-colors duration-200">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    {user.image ? (
+                      <img
+                        src={user.image}
+                        alt={user.name}
+                        class="w-10 h-10 rounded-full object-cover border border-white/20 shadow"
+                      />
+                    ) : (
+                      <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-400">
+                        ?
+                      </div>
+                    )}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                    {user.id}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                    {user.name}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                    {user.email}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span
+                      class={
+                        user.isAdmin
+                          ? "text-green-400 font-semibold"
+                          : "text-gray-400"
+                      }
+                    >
+                      {user.isAdmin ? "Yes" : "No"}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</Layout>
