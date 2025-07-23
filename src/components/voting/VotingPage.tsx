@@ -16,9 +16,15 @@ export function VotingPage({ className = '', loggedUser }: VotingPageProps) {
         'Are you sure you want to reset all votes? This action cannot be undone.',
       )
     ) {
-      actions.voteActions.clearVotes({ confirm: true }).then(() => {
-        window.location.reload();
-      });
+      actions.voteActions
+        .clearVotes({ confirm: true })
+        .then(() => {
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error('Failed to reset votes:', error);
+          alert('An error occurred while resetting votes. Please try again.');
+        });
     }
   };
 
