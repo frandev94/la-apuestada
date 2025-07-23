@@ -36,7 +36,7 @@ export function VotingButton({
       type="button"
       onClick={() => onVote(participantId)}
       disabled={userHasVoted || isVoting}
-      className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${getButtonStyles()}`}
+      className={`w-full py-2 px-4 rounded-lg font-medium transition-colors text-nowrap text-xs md:text-md xl:text-lg ${getButtonStyles()} `}
       aria-label={`Vote for ${fighterName}`}
     >
       {getButtonText()}

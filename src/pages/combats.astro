@@ -5,20 +5,28 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout title="Combats - La Apuestada">
   <main
-    class="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100"
+    class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-8"
   >
     <div class="container mx-auto px-4 py-8">
       <div class="text-center mb-8">
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-          🥊 Combat Arena
-        </h1>
-        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-          Witness the most epic battles of La Velada del Año. Follow every fight
-          and discover who will emerge victorious!
-        </p>
+        <div
+          class="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 p-8 mb-8"
+        >
+          <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+            🥊 Combat Arena
+          </h1>
+          <p class="text-xl text-gray-200 max-w-2xl mx-auto">
+            Witness the most epic battles of La Velada del Año. Follow every
+            fight and discover who will emerge victorious!
+          </p>
+        </div>
       </div>
 
-      <CombatsDisplay client:load />
+      <div
+        class="bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 p-6"
+      >
+        <CombatsDisplay client:load />
+      </div>
     </div>
   </main>
 </Layout>

@@ -22,26 +22,30 @@ export function VotingCard({ combat }: VotingCardProps) {
   const fighter2Data = createFighterData(combat.fighter2);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 transition-transform hover:scale-105">
+    <div className="bg-white/5 backdrop-blur-md rounded-lg shadow-2xl border border-white/10 p-6 transition-transform hover:scale-105 hover:bg-white/10">
       <CombatHeader combatId={combat.id} />
       <ErrorDisplay error={error} />
 
-      <div className="flex  gap-4 items-center">
-        <FighterContainer
-          fighterData={fighter1Data}
-          votingState={votingState}
-          onVote={handleVote}
-          theme={blueTheme}
-        />
-
-        <VSDivider />
-
-        <FighterContainer
-          fighterData={fighter2Data}
-          votingState={votingState}
-          onVote={handleVote}
-          theme={redTheme}
-        />
+      <div className="flex gap-0 items-center">
+        <div className="w-1/3">
+          <FighterContainer
+            fighterData={fighter1Data}
+            votingState={votingState}
+            onVote={handleVote}
+            theme={blueTheme}
+          />
+        </div>
+        <div className="w-1/3 text-center">
+          <VSDivider />
+        </div>
+        <div className="w-1/3">
+          <FighterContainer
+            fighterData={fighter2Data}
+            votingState={votingState}
+            onVote={handleVote}
+            theme={redTheme}
+          />
+        </div>
       </div>
 
       <VoteResultDisplay votingState={votingState} />

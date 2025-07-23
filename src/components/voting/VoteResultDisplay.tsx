@@ -5,9 +5,10 @@ export function VoteResultDisplay({ votingState }: VoteResultDisplayProps) {
   if (!votingState.userVotedFor) return null;
 
   return (
-    <div className="mt-4 p-3 bg-gray-100 rounded-lg text-center">
-      <p className="text-sm text-gray-600">
-        You voted for <strong>{votingState.userVotedFor}</strong>
+    <div className="mt-4 p-3 bg-white/10 backdrop-blur-sm rounded-lg text-center border border-white/20">
+      <p className="text-sm text-gray-200">
+        You voted for{' '}
+        <strong className="text-white">{votingState.userVotedFor}</strong>
       </p>
     </div>
   );
