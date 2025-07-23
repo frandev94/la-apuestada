@@ -4,14 +4,18 @@
   "version": "0.0.2",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build --remote",
     "preview": "astro preview",
     "lint": "biome check",
-    "lint:fix": "biome check --write src test",
+    "lint:fix": "biome check --write",
+    "format": "biome format",
+    "format:fix": "biome format --write",
+    "check": "astro check",
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:ci": "vitest run --coverage",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
     "prepare": "husky",
     "lint-staged": "lint-staged",
     "release": "commit-and-tag-version",
@@ -20,30 +24,45 @@
     "release:patch": "commit-and-tag-version --release-as patch"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx,astro}": ["biome check --write"],
-    "*.{json,jsonc,css}": ["biome format --write"]
+    "*.{js,ts,jsx,tsx,astro,json,jsonc,css}": [
+      "biome check --write --files-ignore-unknown=true --no-errors-on-unmatched"
+    ]
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/db": "^0.15.0",
     "@astrojs/react": "^4.3.0",
-    "@astrojs/vercel": "^8.1.4",
-    "astro": "^5.8.1",
+    "@astrojs/vercel": "^8.2.3",
+    "@auth/core": "^0.37.4",
+    "astro": "^5.12.2",
+    "auth-astro": "^4.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "tailwindcss": "^4.0.15"
+    "tailwindcss": "^4.0.15",
+    "typescript": "^5.8.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@tailwindcss/vite": "^4.1.8",
+    "@tailwindcss/vite": "^4.1.11",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
-    "@types/react": "^19.1.6",
-    "@types/react-dom": "^19.1.5",
-    "@vitest/coverage-v8": "^3.1.4",
+    "@types/node": "^24.1.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitest/coverage-v8": "^3.2.4",
     "commit-and-tag-version": "^12.5.1",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
-    "lint-staged": "^16.1.0",
+    "lint-staged": "^16.1.2",
     "vitest": "^3.0.9"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.45.1"
+  },
+  "overrides": {
+    "vite": {
+      "rollup": "npm:@rollup/wasm-node"
+    }
   }
 }

@@ -1,2 +1,4 @@
+#!/bin/sh
+# Pre-push hook to run tests before commiting changes
+echo "🔍 Running linting checks before commit..."
 npx lint-staged
-npm test

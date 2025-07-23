@@ -6,7 +6,17 @@
     "useIgnoreFile": false
   },
   "files": {
-    "ignoreUnknown": false,
+    "ignoreUnknown": true,
+    "include": [
+      "**/src/**/*",
+      "**/test/**/*",
+      "**/db/**/*",
+      "package.json",
+      "biome.json",
+      "tsconfig.json",
+      "astro.config.mjs",
+      ".vscode/**/*"
+    ],
     "ignore": []
   },
   "formatter": {

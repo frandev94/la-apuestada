@@ -1,4 +1,4 @@
-export const laVeladaParticipants: string[] = [
+export const laVeladaParticipants: EventParticipantsName[] = [
   'peereira',
   'rivaldios',
   'perxitaa',
@@ -14,6 +14,30 @@ export const laVeladaParticipants: string[] = [
   'grefg',
   'westcol',
 ];
+
+export type EventParticipantsName =
+  | 'peereira'
+  | 'rivaldios'
+  | 'perxitaa'
+  | 'gaspi'
+  | 'abby'
+  | 'roro'
+  | 'andoni'
+  | 'carlos'
+  | 'alana'
+  | 'arigeli'
+  | 'viruzz'
+  | 'tomas'
+  | 'grefg'
+  | 'westcol';
+
+export const generateFighterAvatarUrl = (
+  fighterId: EventParticipantsName,
+  size: 'big' | 'cards' = 'cards',
+): string => {
+  const path = `https://www.infolavelada.com/images/fighters/${size}/${fighterId}.webp`;
+  return path;
+};
 
 // Function to validate the participants list
 export function validateParticipantsList(

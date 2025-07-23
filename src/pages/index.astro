@@ -1,11 +1,128 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
-	<Welcome />
+  <main
+    class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"
+  >
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="text-center">
+          <!-- Main Title -->
+          <h1
+            class="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight"
+          >
+            <span
+              class="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"
+            >
+              LA APUESTADA
+            </span>
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="text-2xl md:text-3xl text-gray-300 mb-4 font-medium">
+            La Velada del Año
+          </p>
+
+          <!-- Description -->
+          <p
+            class="text-lg md:text-xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed"
+          >
+            ¡Prepárate para el evento del año! Crea tus apuestas, predice los
+            resultados y vive la emoción de los combates más épicos entre tus
+            streamers favoritos.
+          </p>
+
+          <!-- CTA Buttons -->
+          <div
+            class="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          >
+            <a
+              href="/combats"
+              class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-lg font-semibold rounded-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+            >
+              🥊 Ver Combates
+            </a>
+
+            <a
+              href="/voting"
+              class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white text-lg font-semibold rounded-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+            >
+              🎯 Hacer Apuestas
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decorative elements -->
+      <div
+        class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none"
+      >
+        <div
+          class="absolute top-20 left-10 w-32 h-32 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"
+        >
+        </div>
+        <div
+          class="absolute top-40 right-10 w-40 h-40 bg-red-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-1000"
+        >
+        </div>
+        <div
+          class="absolute bottom-20 left-20 w-36 h-36 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-2000"
+        >
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div
+          class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center hover:bg-white/15 transition-all duration-300 border border-white/20"
+        >
+          <div class="text-5xl mb-4">🥊</div>
+          <h3 class="text-2xl font-bold text-white mb-4">Combates Épicos</h3>
+          <p class="text-gray-300 leading-relaxed">
+            Sigue todos los combates de La Velada del Año en tiempo real y vive
+            la emoción de cada golpe.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div
+          class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center hover:bg-white/15 transition-all duration-300 border border-white/20"
+        >
+          <div class="text-5xl mb-4">🎯</div>
+          <h3 class="text-2xl font-bold text-white mb-4">
+            Apuestas Inteligentes
+          </h3>
+          <p class="text-gray-300 leading-relaxed">
+            Crea tus predicciones, analiza las estadísticas y compite con otros
+            fans para ser el mejor apostador.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div
+          class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center hover:bg-white/15 transition-all duration-300 border border-white/20"
+        >
+          <div class="text-5xl mb-4">🏆</div>
+          <h3 class="text-2xl font-bold text-white mb-4">Ranking Global</h3>
+          <p class="text-gray-300 leading-relaxed">
+            Escala en el ranking mundial y demuestra que eres el mejor predictor
+            de La Velada del Año.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center py-8 border-t border-white/20">
+      <p class="text-gray-400">
+        Hecho con ❤️ para la comunidad de La Velada del Año
+      </p>
+    </div>
+  </main>
 </Layout>

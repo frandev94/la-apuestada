@@ -1,16 +1,40 @@
 #!/bin/sh
-# Check commit message format
-commit_regex='^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .{1,50}'
+# Check commit message format according to Conventional Commits v1.0.0
+# https://www.conventionalcommits.org/en/v1.0.0/
 
-# Allow merge commits
-if grep -qE '^Merge' "$1"; then
+# Read the commit message
+commit_message=$(cat "$1")
+
+# Enhanced regex that allows more flexible scopes and better validation
+commit_regex='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-zA-Z0-9][a-zA-Z0-9-]*\))?(!)?:\s.{1,}$'
+
+# Allow merge commits (more comprehensive patterns)
+if echo "$commit_message" | grep -qE '^(Merge|Revert)' || echo "$commit_message" | grep -qE '^[0-9a-f]{7,40}'; then
+    echo "✅ Merge/revert commit detected - skipping validation"
     exit 0
 fi
 
-if ! grep -qE "$commit_regex" "$1"; then
-    echo "Invalid commit message format!"
-    echo "Commit message should start with one of: feat, fix, docs, style, refactor, test, chore"
-    echo "Format: type(scope): description"
-    echo "Example: feat(auth): add user login functionality"
+# Validate commit message format
+if ! echo "$commit_message" | grep -qE "$commit_regex"; then
+    echo "❌ Invalid commit message format!"
+    echo ""
+    echo "📋 Commit message must follow Conventional Commits specification:"
+    echo "📝 Format: type(scope): description"
+    echo ""
+    echo "🔧 Available types: build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test"
+    echo "🎯 Optional scope: (api), (ui), (auth), (db), (test), etc."
+    echo "⚠️ Optional breaking change: ! after scope"
+    echo ""
+    echo "💡 Examples:"
+    echo "  feat: add user authentication"
+    echo "  fix(api): resolve login endpoint error"
+    echo "  feat(auth)!: change authentication method"
+    echo "  docs: update installation guide"
+    echo "  test(api): add users endpoint tests"
+    echo ""
+    echo "🚫 Your commit message:"
+    echo "  $commit_message"
     exit 1
 fi
+
+echo "✅ Commit message format is valid"

@@ -1,8 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import {
-  laVeladaParticipants,
-  validateParticipantsList,
-} from '../src/data/participants.js';
+import { laVeladaParticipants, validateParticipantsList } from './participants';
 
 describe('Participants Module', () => {
   test('basic import test', () => {
