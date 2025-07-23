@@ -1,6 +1,13 @@
 /// <reference types="vitest" />
 import { getViteConfig } from 'astro/config';
+import type { InlineConfig } from 'vitest/node';
 
+// Extend Astro's UserConfig to include Vitest's test property
+declare module 'astro/config' {
+  interface UserConfig {
+    test?: InlineConfig;
+  }
+}
 
 export default getViteConfig({
   test: {
@@ -29,4 +36,4 @@ export default getViteConfig({
     testTimeout: 10000,
     hookTimeout: 10000,
   },
-});
+} as any); // Type assertion to bypass TypeScript issues
