@@ -34,6 +34,10 @@ export interface FighterDisplayProps {
   fighterData: FighterVoteData;
 }
 
+export interface VoteCountProps {
+  voteCount: number;
+}
+
 export interface VotingControlProps extends VotingActions {
   votingState: VotingState;
   participantId: EventParticipantsName;

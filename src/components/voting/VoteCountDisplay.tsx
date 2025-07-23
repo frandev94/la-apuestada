@@ -1,12 +1,10 @@
-import type { FighterDisplayProps, ThemedComponentProps } from './types';
+import type { ThemedComponentProps, VoteCountProps } from './types';
 
 // SRP: Component responsible only for vote count display
 export function VoteCountDisplay({
-  fighterData,
+  voteCount,
   theme,
-}: FighterDisplayProps & ThemedComponentProps) {
-  const { voteCount } = fighterData;
-
+}: VoteCountProps & ThemedComponentProps) {
   return (
     <div className="mb-3">
       <span className={`text-xl font-semibold ${theme.voteCountColor}`}>

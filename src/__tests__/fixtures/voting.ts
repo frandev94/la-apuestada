@@ -1,5 +1,5 @@
 import type { Participant } from '@/components/voting/types';
-import type { Vote, VoteResults } from '@/lib/voting';
+import type { VoteResults } from '@/lib/voting';
 
 /**
  * Test fixtures for voting-related components and functionality
@@ -29,7 +29,7 @@ export const mockParticipants: Participant[] = [
   },
 ];
 
-export const mockVotes: Vote[] = [
+export const mockVotes = [
   {
     participantId: 'peereira',
     timestamp: 1640995200000, // 2022-01-01T00:00:00Z

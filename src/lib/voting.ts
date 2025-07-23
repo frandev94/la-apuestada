@@ -191,6 +191,9 @@ export async function clearVotes(): Promise<boolean> {
 /**
  * Gets the user's vote if they have voted
  */
-export async function getUserVote(userId: string): Promise<VoteRecord | null> {
-  return await voteRepository.getVoteByUser(userId);
+export async function getUserVote(
+  userId: string,
+  combatId: number,
+): Promise<VoteRecord | null> {
+  return await voteRepository.getVoteByUser(userId, combatId);
 }

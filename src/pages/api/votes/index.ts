@@ -1,23 +1,22 @@
+import { createErrorResponse, createSuccessResponse } from '@/lib/api';
 import type { APIRoute } from 'astro';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const { userId, participantId, combatId } = await request.json();
 
-    if (!userId || !participantId) {
-      return new Response(
-        JSON.stringify({ error: 'User ID and participant ID are required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      );
+    if (!userId || !participantId || !combatId) {
+      return createErrorResponse({
+        status: 400,
+        message: 'User ID, participant ID, and combat ID are required',
+        error: 'Invalid request',
+      });
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'Vote submitted successfully',
-      }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } },
-    );
+    return createSuccessResponse({
+      message: 'Vote submitted successfully',
+      data: undefined,
+    });
   } catch (error) {
     console.error('Vote submission error:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
@@ -33,15 +32,18 @@ export const GET: APIRoute = async ({ url }) => {
     const combatId = url.searchParams.get('combatId');
     const action = url.searchParams.get('action');
 
-    if (action === 'results') {
-      return new Response(JSON.stringify({ results: [], totalVotes: 0 }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
+    if (action === 'results' && combatId) {
+      return new Response(
+        JSON.stringify({ results: [], totalVotes: 0, combatId }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
     }
 
-    if (action === 'user-vote' && userId) {
-      return new Response(JSON.stringify({ userVote: null }), {
+    if (action === 'user-vote' && userId && combatId) {
+      return new Response(JSON.stringify({ userVote: null, combatId }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });

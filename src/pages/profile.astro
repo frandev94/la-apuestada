@@ -25,9 +25,9 @@ const { user, expires } = session;
 
         <div class="flex items-center gap-4 mb-6">
           {
-            session.user?.image && (
+            user?.image && (
               <img
-                src={session.user.image}
+                src={user.image}
                 alt="Profile"
                 class="w-16 h-16 rounded-full border-2 border-white/20"
               />
@@ -35,9 +35,9 @@ const { user, expires } = session;
           }
           <div>
             <h2 class="text-xl font-semibold text-white">
-              {session.user?.name}
+              {user?.name}
             </h2>
-            <p class="text-gray-300">{session.user?.email}</p>
+            <p class="text-gray-300">{user?.email}</p>
           </div>
         </div>
 

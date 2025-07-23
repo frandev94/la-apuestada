@@ -13,9 +13,9 @@ export function VotingResults() {
     updateResults();
   }, []);
 
-  const updateResults = () => {
-    setResults(getVoteResults());
-    setTotalVotes(getTotalVotes());
+  const updateResults = async () => {
+    setResults(await getVoteResults());
+    setTotalVotes(await getTotalVotes());
   };
 
   const getParticipantName = (participantId: string): string => {

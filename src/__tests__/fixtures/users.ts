@@ -1,3 +1,4 @@
+import { generateUUID } from '@/lib/crypto';
 import type { MockSafeUser, MockUser } from '../utils/test-helpers';
 
 /**
@@ -29,30 +30,36 @@ export const invalidUserData = {
 
 export const mockUserRecords: MockUser[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Alice Smith',
-    hashed_password: 'hashed_password_1',
-    createdAt: '2024-01-01T10:00:00Z',
-    updatedAt: '2024-01-01T10:00:00Z',
+    createdAt: new Date('2024-01-01T10:00:00Z'),
+    updatedAt: new Date('2024-01-01T10:00:00Z'),
+    email: '',
+    image: null,
+    isAdmin: false,
   },
   {
-    id: 2,
+    id: '2',
     name: 'Bob Johnson',
-    hashed_password: 'hashed_password_2',
-    createdAt: '2024-01-02T11:00:00Z',
-    updatedAt: '2024-01-02T11:00:00Z',
+    createdAt: new Date('2024-01-02T11:00:00Z'),
+    updatedAt: new Date('2024-01-02T11:00:00Z'),
+    email: '',
+    image: null,
+    isAdmin: false,
   },
   {
-    id: 3,
+    id: generateUUID(),
     name: 'Charlie Brown',
-    hashed_password: 'hashed_password_3',
-    createdAt: '2024-01-03T12:00:00Z',
-    updatedAt: '2024-01-03T12:00:00Z',
+    createdAt: new Date('2024-01-03T12:00:00Z'),
+    updatedAt: new Date('2024-01-03T12:00:00Z'),
+    email: '',
+    image: null,
+    isAdmin: false,
   },
 ];
 
 export const mockSafeUserRecords: MockSafeUser[] = mockUserRecords.map(
-  ({ hashed_password, ...user }) => user,
+  ({ ...user }) => user,
 );
 
 export const paginationTestCases = [

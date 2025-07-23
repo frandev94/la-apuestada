@@ -3,7 +3,9 @@ import { generateFighterAvatarUrl } from '../../constants/participants';
 import type { FighterVoteData } from './types';
 
 // SRP: Fighter data factory
-export function createFighterData(fighterId: string): FighterVoteData {
+export function createFighterData(
+  fighterId: EventParticipantsName,
+): FighterVoteData {
   return {
     fighter: {
       id: fighterId,
