@@ -36,8 +36,16 @@ const authCookieMiddleware = defineMiddleware(
           expires: session.expires ? new Date(session.expires) : undefined,
         });
         // create user if needed
-        if (session?.user?.email && session?.user?.name)
-          await createUserIfNeeded(session.user);
+        if (session?.user?.email && session?.user?.name) {
+          const { email, image, name } = session.user;
+          await createOrUpdateUser({ email, image, name }).catch((error) => {
+            console.error(
+              'Error creating or updating user:',
+              { email, image, name },
+              error,
+            );
+          });
+        }
       }
       return next();
     }
@@ -78,24 +86,6 @@ const sessionAndAuthMiddleware = sequence(
   sessionMiddleware,
   authCookieMiddleware,
 );
-
-/**
- *
- */
-const createUserIfNeeded = async ({ email, image, name }: User) => {
-  try {
-    if (!email || !name) return;
-    const upsertUser = await createOrUpdateUser({ email, name, image });
-    if (upsertUser.id) {
-      console.log('User created or updated:', upsertUser.id);
-    } else {
-      throw new Error('User creation or update failed');
-    }
-    return upsertUser;
-  } catch (error) {
-    throw new Error(`Error creating or updating user: ${error}`);
-  }
-};
 
 export const onRequest = sequence(
   sessionAndAuthMiddleware,
