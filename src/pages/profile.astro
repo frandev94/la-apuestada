@@ -1,18 +1,29 @@
 ---
 import { SignOutButton } from '@/components/auth';
+import { getUserAndSessionFromRequest } from '@/lib/session';
+import { getVotesByUser } from '@/lib/voting';
+import { getAllWinners } from '@/lib/winners';
 import { getSession } from 'auth-astro/server';
 import Layout from '../layouts/Layout.astro';
 
-const session = await getSession(Astro.request);
+const { user, session } = await getUserAndSessionFromRequest(Astro.request);
 
-if (!session || !session.user) {
+if (!session || !session.user || !user) {
   return Astro.redirect('/login');
 }
 
-const { user, expires } = session;
+const expires = session.expires;
+const votes = await getVotesByUser(user.id);
+const combatWinners = await getAllWinners();
+
+const winsCount = combatWinners.filter((winner) =>
+  votes.some((vote) => vote.participantId === winner.winner),
+).length;
+
+const lossesCount = votes.length - winsCount;
 ---
 
-<Layout title="Profile - La Apuestada">
+<Layout title="Perfil - La Apuestada">
   <main
     class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-12 px-4"
   >
@@ -21,7 +32,7 @@ const { user, expires } = session;
         class="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 p-8"
       >
         <h1 class="text-3xl font-bold text-white mb-6">
-          Welcome to La Apuestada!
+          ¡Bienvenido a La Apuestada!
         </h1>
 
         <div class="flex items-center gap-4 mb-6">
@@ -29,7 +40,7 @@ const { user, expires } = session;
             user?.image && (
               <img
                 src={user.image}
-                alt="Profile"
+                alt="Perfil"
                 class="w-16 h-16 rounded-full border-2 border-white/20"
               />
             )
@@ -44,43 +55,49 @@ const { user, expires } = session;
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-white/5 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-white mb-3">Your Stats</h3>
+            <h3 class="text-lg font-semibold text-white mb-3">Tus estadísticas</h3>
             <div class="space-y-2">
               <p class="text-gray-300">
-                Total Bets: <span class="text-white font-semibold">0</span>
+                Apuestas totales: <span class="text-white font-semibold"
+                  >{votes.length}</span
+                >
               </p>
               <p class="text-gray-300">
-                Wins: <span class="text-green-400 font-semibold">0</span>
+                Victorias: <span class="text-green-400 font-semibold"
+                  >{winsCount}</span
+                >
               </p>
               <p class="text-gray-300">
-                Losses: <span class="text-red-400 font-semibold">0</span>
+                Derrotas: <span class="text-red-400 font-semibold"
+                  >{lossesCount}</span
+                >
               </p>
             </div>
           </div>
 
           <div class="bg-white/5 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-white mb-3">Quick Actions</h3>
+            <h3 class="text-lg font-semibold text-white mb-3">Accesos rápidos</h3>
             <div class="space-y-3">
               <a
                 href="/combats"
                 class="block w-full text-center py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors"
               >
-                View Combats
+                Ver combates
               </a>
               <a
                 href="/voting"
                 class="block w-full text-center py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors"
               >
-                Place Bets
+                Apostar
               </a>
             </div>
           </div>
         </div>
 
         <div class="mt-8 flex justify-between items-center">
-          <p class="text-gray-400 text-sm">Connected via Discord</p>
+          <p class="text-gray-400 text-sm">Conectado vía Discord</p>
           <p class="text-gray-400 text-sm">
-            Session Expires: {new Date(expires).toLocaleString()}
+            Sesión expira: {new Date(expires).toLocaleString()}
           </p>
           <SignOutButton />
         </div>
