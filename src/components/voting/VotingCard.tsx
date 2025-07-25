@@ -10,11 +10,12 @@ import type { VotingCardProps } from './types';
 import { useVotingLogic } from './useVotingLogic';
 
 // Main component following SRP
-export function VotingCard({ combat }: VotingCardProps) {
+export function VotingCard({ combat, locked = false }: VotingCardProps) {
   const { user } = useUser(); // Ensure user context is available
   const { votingState, error, handleVote } = useVotingLogic({
     combat,
     userId: user?.id,
+    locked,
   });
 
   // Create fighter data using factory function
@@ -33,6 +34,7 @@ export function VotingCard({ combat }: VotingCardProps) {
             votingState={votingState}
             onVote={handleVote}
             theme={blueTheme}
+            locked={locked}
           />
         </div>
         <div className="w-1/3 text-center">
@@ -44,6 +46,7 @@ export function VotingCard({ combat }: VotingCardProps) {
             votingState={votingState}
             onVote={handleVote}
             theme={redTheme}
+            locked={locked}
           />
         </div>
       </div>

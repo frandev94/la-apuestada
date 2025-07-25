@@ -4,7 +4,6 @@ export interface Combat {
   id: number;
   fighter1: EventParticipantsName;
   fighter2: EventParticipantsName;
-  winner?: EventParticipantsName;
   year: string;
 }
 
@@ -71,20 +70,6 @@ export function getCombatsByFighter(fighterName: string): Combat[] {
 }
 
 /**
- * Get all scheduled combats
- */
-export function getScheduledCombats(): Combat[] {
-  return laVeladaCombats.filter((combat) => combat.winner == null);
-}
-
-/**
- * Get all finished combats
- */
-export function getFinishedCombats(): Combat[] {
-  return laVeladaCombats.filter((combat) => combat.winner != null);
-}
-
-/**
  * Get the opponent of a given fighter in their combat
  */
 export function getOpponent(fighterName: string): string | null {
@@ -92,22 +77,6 @@ export function getOpponent(fighterName: string): string | null {
   if (!combat) return null;
 
   return combat.fighter1 === fighterName ? combat.fighter2 : combat.fighter1;
-}
-
-/**
- * Update combat result
- */
-export function updateCombatResult(combatId: number, winner: string): boolean {
-  const combat = getCombatById(combatId);
-  if (!combat) return false;
-
-  // Validate that winner is one of the fighters
-  if (winner !== combat.fighter1 && winner !== combat.fighter2) {
-    return false;
-  }
-
-  combat.winner = winner;
-  return true;
 }
 
 /**

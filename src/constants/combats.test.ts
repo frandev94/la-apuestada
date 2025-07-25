@@ -2,12 +2,9 @@ import { describe, expect, test } from 'vitest';
 import {
   getCombatById,
   getCombatsByFighter,
-  getFinishedCombats,
   getOpponent,
-  getScheduledCombats,
   getTotalCombats,
   laVeladaCombats,
-  updateCombatResult,
   validateCombats,
 } from './combats';
 
@@ -16,10 +13,7 @@ describe('Combats Module', () => {
     expect(laVeladaCombats).toBeDefined();
     expect(getCombatById).toBeDefined();
     expect(getCombatsByFighter).toBeDefined();
-    expect(getScheduledCombats).toBeDefined();
-    expect(getFinishedCombats).toBeDefined();
     expect(getOpponent).toBeDefined();
-    expect(updateCombatResult).toBeDefined();
     expect(getTotalCombats).toBeDefined();
     expect(validateCombats).toBeDefined();
   });
@@ -122,27 +116,6 @@ describe('Combats Module', () => {
     });
   });
 
-  describe('getScheduledCombats', () => {
-    test('should return all combats initially', () => {
-      const scheduled = getScheduledCombats();
-      expect(scheduled).toHaveLength(7);
-    });
-
-    test('should return only scheduled combats', () => {
-      const scheduled = getScheduledCombats();
-      for (const combat of scheduled) {
-        expect(combat.winner).toBeUndefined();
-      }
-    });
-  });
-
-  describe('getFinishedCombats', () => {
-    test('should return empty array initially', () => {
-      const finished = getFinishedCombats();
-      expect(finished).toHaveLength(0);
-    });
-  });
-
   describe('getOpponent', () => {
     test('should return correct opponent for fighter1', () => {
       const opponent = getOpponent('peereira');
@@ -157,40 +130,6 @@ describe('Combats Module', () => {
     test('should return null for non-existent fighter', () => {
       const opponent = getOpponent('nonexistent');
       expect(opponent).toBeNull();
-    });
-  });
-
-  describe('updateCombatResult', () => {
-    test('should update combat result successfully', () => {
-      const success = updateCombatResult(1, 'peereira');
-      expect(success).toBe(true);
-
-      const combat = getCombatById(1);
-      expect(combat?.winner).toBe('peereira');
-    });
-
-    test('should fail for invalid combat ID', () => {
-      const success = updateCombatResult(99, 'peereira');
-      expect(success).toBe(false);
-    });
-
-    test('should fail for invalid winner', () => {
-      const success = updateCombatResult(2, 'invalid_fighter');
-      expect(success).toBe(false);
-    });
-
-    test('should update finished combats count', () => {
-      // Reset combat 1 to scheduled for this test
-      const combat1 = getCombatById(1);
-      if (combat1) {
-        combat1.winner = undefined;
-      }
-
-      const initialFinished = getFinishedCombats().length;
-      updateCombatResult(1, 'peereira');
-      const afterFinished = getFinishedCombats().length;
-
-      expect(afterFinished).toBe(initialFinished + 1);
     });
   });
 

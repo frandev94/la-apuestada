@@ -1,5 +1,6 @@
 import { actions } from 'astro:actions';
 import type { UserRecord } from '@/lib/db/user-repository';
+import type { CombatWinnerRecord } from '@/lib/db/winner-repository';
 import { laVeladaCombats } from '../../constants/combats';
 import { UserProvider } from '../UserContext';
 import { VotingCard } from './VotingCard';
@@ -7,9 +8,14 @@ import { VotingCard } from './VotingCard';
 interface VotingPageProps {
   className?: string;
   loggedUser?: UserRecord | null;
+  winners?: CombatWinnerRecord[];
 }
 
-export function VotingPage({ className = '', loggedUser }: VotingPageProps) {
+export function VotingPage({
+  className = '',
+  loggedUser,
+  winners = [],
+}: VotingPageProps) {
   const handleResetVotes = () => {
     if (
       confirm(
@@ -57,7 +63,11 @@ export function VotingPage({ className = '', loggedUser }: VotingPageProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <UserProvider initialUser={loggedUser}>
                 {laVeladaCombats.map((combat) => (
-                  <VotingCard key={combat.id} combat={combat} />
+                  <VotingCard
+                    key={combat.id}
+                    combat={combat}
+                    locked={winners.some((w) => w.combatId === combat.id)}
+                  />
                 ))}
               </UserProvider>
             </div>

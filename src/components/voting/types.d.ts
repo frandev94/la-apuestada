@@ -41,6 +41,7 @@ export interface VoteCountProps {
 export interface VotingControlProps extends VotingActions {
   votingState: VotingState;
   participantId: EventParticipantsName;
+  disabled?: boolean;
 }
 
 export interface ThemedComponentProps {
@@ -64,8 +65,10 @@ export interface FighterContainerProps {
   votingState: VotingState;
   onVote: (participantId: EventParticipantsName) => void;
   theme: ThemeConfig;
+  locked?: boolean;
 }
 
 export interface VotingCardProps {
   combat: Combat;
+  locked?: boolean;
 }

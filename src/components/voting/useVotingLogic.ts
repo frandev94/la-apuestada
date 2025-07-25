@@ -7,10 +7,15 @@ import type { VotingState } from './types';
 type UseVotingLogicProps = {
   combat: Combat;
   userId?: string;
+  locked?: boolean;
 };
 
 // SRP: Custom hook for voting logic separation
-export function useVotingLogic({ combat, userId }: UseVotingLogicProps) {
+export function useVotingLogic({
+  combat,
+  userId,
+  locked = false,
+}: UseVotingLogicProps) {
   const { castVote } = actions.voteActions;
   const [votingState, setVotingState] = useState<VotingState>({
     userVotedFor: null,
@@ -36,6 +41,10 @@ export function useVotingLogic({ combat, userId }: UseVotingLogicProps) {
   }, [combat]);
 
   const handleVote = async (participantId: EventParticipantsName) => {
+    if (locked) {
+      setError('Voting is locked for this combat');
+      return;
+    }
     if (!userId) {
       setError('Please log in to vote');
       return;

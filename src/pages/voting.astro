@@ -1,11 +1,13 @@
 ---
 import { getUserFromRequest } from '@/lib/session';
+import { getAllWinners } from '@/lib/winners';
 import { VotingPage } from '../components/voting/VotingPage';
 import Layout from '../layouts/Layout.astro';
 
 const user = await getUserFromRequest(Astro.request);
+const winners = await getAllWinners(); // combat winners
 ---
 
 <Layout>
-  <VotingPage loggedUser={user} client:load />
+  <VotingPage loggedUser={user} winners={winners} client:load />
 </Layout>
