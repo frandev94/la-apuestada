@@ -1,0 +1,11 @@
+---
+import { SignOut } from 'auth-astro/components';
+interface Props {
+  full?: boolean;
+}
+
+const { full } = Astro.props;
+const className = `block text-center px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors ${full ? 'w-full' : 'w-auto'}`;
+---
+
+<SignOut class={className}>Sign Out</SignOut>

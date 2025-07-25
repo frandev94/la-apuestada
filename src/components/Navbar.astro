@@ -1,7 +1,7 @@
 ---
 import { getSession } from 'auth-astro/server';
+import { DiscordButton } from './auth';
 import AuthenticationSection from './auth/AuthenticationSection.astro';
-import DiscordButton from './auth/DiscordButton.astro';
 
 interface Props {
   currentPath?: string;
@@ -13,9 +13,24 @@ const { currentPath = '' } = Astro.props;
 const session = await getSession(Astro.request);
 
 const navItems = [
-  { href: '/', label: 'Home', icon: '🏠' },
-  { href: '/combats', label: 'Combats', icon: '🥊' },
-  { href: '/voting', label: 'Voting', icon: '🗳️' },
+  {
+    href: '/combats',
+    label: 'Combates',
+    icon: '🥊',
+    color: 'from-red-600 to-red-700',
+  },
+  {
+    href: '/voting',
+    label: 'Apuestas',
+    icon: '🎯',
+    color: 'from-blue-500 to-indigo-500',
+  },
+  {
+    href: '/ranking',
+    label: 'Ranking',
+    icon: '🏆',
+    color: 'from-yellow-500 to-orange-500',
+  },
 ];
 
 const isActive = (href: string) => {
@@ -25,7 +40,9 @@ const isActive = (href: string) => {
 };
 ---
 
-<nav class="bg-gradient-to-r from-purple-900/95 via-blue-900/95 to-indigo-900/95 backdrop-blur-md shadow-2xl border-b border-white/20">
+<nav
+  class="bg-gradient-to-r from-purple-900/95 via-blue-900/95 to-indigo-900/95 backdrop-blur-md shadow-2xl border-b border-white/20"
+>
   <div class="container mx-auto px-4">
     <div class="flex justify-between items-center h-16">
       <!-- Logo/Brand -->
@@ -38,19 +55,23 @@ const isActive = (href: string) => {
 
       <!-- Navigation Links (Desktop) -->
       <div class="hidden md:block">
-        <div class="ml-10 flex items-baseline space-x-4">
+        <div class="ml-10 flex items-baseline space-x-2">
           {
             navItems.map((item) => (
               <a
                 href={item.href}
-                class={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center space-x-1 ${
-                  isActive(item.href)
-                    ? "bg-white/20 text-white border-b-2 border-purple-900"
-                    : "text-gray-200 hover:text-white hover:bg-white/10"
-                }`}
+                class={`px-2 py-2 rounded-md font-medium transition-colors duration-200 flex items-center space-x-1 bg-gradient-to-r ${item.color} \
+                  text-xs md:text-sm \
+                  ${
+                    isActive(item.href)
+                      ? "text-white border-b-2 border-purple-900 shadow-xl hover:scale-105"
+                      : "text-gray-200 hover:text-white hover:bg-white/10"
+                  }`}
               >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
+                <span class="text-lg md:text-xl hidden lg:block">
+                  {item.icon}
+                </span>
+                <span class="hidden sm:inline">{item.label}</span>
               </a>
             ))
           }
@@ -58,12 +79,15 @@ const isActive = (href: string) => {
       </div>
 
       <!-- Authentication Section (Desktop) -->
-      <AuthenticationSection {session} />
+      <div class="hidden md:block">
+        <AuthenticationSection {session} />
+      </div>
 
       <!-- Mobile menu button -->
       <div class="md:hidden">
         <button
           type="button"
+          id="mobile-menu-button"
           class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-400"
           aria-controls="mobile-menu"
           aria-expanded="false"
@@ -103,7 +127,7 @@ const isActive = (href: string) => {
   </div>
 
   <!-- Mobile menu (hidden by default) -->
-  <div class="mobile-menu hidden md:hidden">
+  <div id="mobile-menu" class="mobile-menu hidden md:hidden">
     <div
       class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-black/20 backdrop-blur-md border-t border-white/20"
     >
@@ -111,9 +135,9 @@ const isActive = (href: string) => {
         navItems.map((item) => (
           <a
             href={item.href}
-            class={`flex px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 items-center space-x-2 ${
+            class={`flex px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 items-center space-x-2 bg-gradient-to-r hover:scale-x-95 ${item.color} ${
               isActive(item.href)
-                ? "bg-white/20 text-white border-l-4 border-purple-400"
+                ? "text-white border-l-4 border-purple-400 shadow-xl "
                 : "text-gray-200 hover:text-white hover:bg-white/10"
             }`}
           >
@@ -122,94 +146,46 @@ const isActive = (href: string) => {
           </a>
         ))
       }
-      
+
       <!-- Mobile Authentication Section -->
       <div class="border-t border-white/20 pt-3 mt-3">
-        {session ? (
-          <!-- Authenticated User (Mobile) -->
-          <div class="px-3 py-2 space-y-2">
-            <div class="flex items-center space-x-3">
-              {session.user?.image && (
-                <img 
-                  src={session.user.image} 
-                  alt="Profile" 
-                  class="w-8 h-8 rounded-full border border-white/20"
-                />
-              )}
-              <div>
-                <p class="text-sm font-medium text-white">{session.user?.name}</p>
-                <p class="text-xs text-gray-300">Discord User</p>
-              </div>
+        {
+          session ? (
+            // <!-- Authenticated User (Mobile) -->
+            <AuthenticationSection session={session} />
+          ) : (
+            // <!-- Not authenticated (Mobile) -->
+            <div class="px-3 py-2">
+              <DiscordButton full />
             </div>
-            <div class="space-y-2">
-              <a
-                href="/profile"
-                class="block w-full text-center px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-              >
-                Profile
-              </a>
-              <button
-                id="mobile-signout"
-                class="block w-full text-center px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        ) : (
-          <!-- Not authenticated (Mobile) -->
-          <div class="px-3 py-2">
-            <DiscordButton />
-          </div>
-        )}
+          )
+        }
       </div>
     </div>
   </div>
 </nav>
 
-<script is:inline>
+<script>
   function setupNavbar() {
     // Mobile menu toggle
-    const menuButton = document.querySelector('.mobile-menu-button');
-    const mobileMenu = document.querySelector('.mobile-menu');
-    
+    const menuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+
     if (menuButton && mobileMenu) {
       menuButton.onclick = () => {
-        const isOpen = !mobileMenu.classList.contains('hidden');
-        mobileMenu.classList.toggle('hidden');
-        menuButton.setAttribute('aria-expanded', (!isOpen).toString());
-        
+        const isOpen = !mobileMenu.classList.contains("hidden");
+        mobileMenu.classList.toggle("hidden");
+        menuButton.setAttribute("aria-expanded", (!isOpen).toString());
+
         // Toggle icons
-        const [menuIcon, closeIcon] = menuButton.querySelectorAll('svg');
-        menuIcon.classList.toggle('hidden', !isOpen);
-        closeIcon.classList.toggle('hidden', isOpen);
+        const [menuIcon, closeIcon] = menuButton.querySelectorAll("svg");
+        menuIcon.classList.toggle("hidden", !isOpen);
+        closeIcon.classList.toggle("hidden", isOpen);
       };
     }
-
-    // Sign out buttons
-    document.querySelectorAll('#desktop-signout, #mobile-signout').forEach(btn => {
-      if (btn) {
-        btn.onclick = async () => {
-          try {
-            const { signOut } = await import('auth-astro/client');
-            await signOut();
-          } catch (error) {
-            console.error('Sign out error:', error);
-          }
-        };
-      }
-    });
   }
-
-  // Initialize
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupNavbar);
-  } else {
-    setupNavbar();
-  }
-
   // Re-initialize on Astro navigation
-  document.addEventListener('astro:page-load', setupNavbar);
+  document.addEventListener("astro:page-load", setupNavbar);
 </script>
 
 <style>

@@ -1,6 +1,7 @@
 import { defineMiddleware, sequence } from 'astro:middleware';
-import type { Session, User } from '@auth/core/types';
+import type { Session } from '@auth/core/types';
 import { getSession } from 'auth-astro/server';
+import { generateUUID } from './lib/crypto';
 import { createOrUpdateUser, getUserByEmail } from './lib/db/user-repository';
 
 const authCookieName = 'la_apuestada_auth';
@@ -38,7 +39,12 @@ const authCookieMiddleware = defineMiddleware(
         // create user if needed
         if (session?.user?.email && session?.user?.name) {
           const { email, image, name } = session.user;
-          await createOrUpdateUser({ email, image, name }).catch((error) => {
+          await createOrUpdateUser({
+            id: generateUUID(),
+            email,
+            image,
+            name,
+          }).catch((error) => {
             console.error(
               'Error creating or updating user:',
               { email, image, name },
@@ -78,6 +84,34 @@ const adminProtectionMiddleware = defineMiddleware(
     return next();
   },
 );
+
+const corsMiddleware = defineMiddleware(async ({ request }, next) => {
+  if (request.method === 'OPTIONS') {
+    const headers = new Headers();
+    headers.append('Access-Control-Allow-Origin', '*');
+    headers.append('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+    headers.append(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept',
+    );
+    return new Response(null, { headers });
+  }
+
+  const response = await next();
+
+  const headers = new Headers(response.headers);
+  headers.append('Access-Control-Allow-Origin', '*');
+  headers.append('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  headers.append(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept',
+  );
+
+  return new Response(response.body, {
+    ...response,
+    headers: headers,
+  });
+});
 
 /**
  * Combined middleware to handle session and authentication cookie management.

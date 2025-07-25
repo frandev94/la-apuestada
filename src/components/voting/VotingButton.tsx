@@ -25,10 +25,10 @@ export function VotingButton({
   };
 
   const getButtonText = (): string => {
-    if (userVotedFor === participantId) return '✓ Voted';
-    if (isVoting) return 'Voting...';
-    if (userHasVoted) return "Can't Vote";
-    return `Vote ${fighterName}`;
+    if (userVotedFor === participantId) return '\u2713 Votado';
+    if (isVoting) return 'Votando...';
+    if (userHasVoted) return 'No puedes votar';
+    return `Votar por ${fighterName}`;
   };
 
   return (
@@ -36,8 +36,8 @@ export function VotingButton({
       type="button"
       onClick={() => onVote(participantId)}
       disabled={userHasVoted || isVoting}
-      className={`w-full py-2 px-4 rounded-lg font-medium transition-colors text-nowrap text-xs md:text-md xl:text-lg ${getButtonStyles()} `}
-      aria-label={`Vote for ${fighterName}`}
+      className={`w-full py-2 px-4 rounded-lg font-medium transition-colors min-h-16 text-sm md:text-md xl:text-lg ${getButtonStyles()}`}
+      aria-label={`Votar por ${fighterName}`}
     >
       {getButtonText()}
     </button>

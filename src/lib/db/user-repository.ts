@@ -2,6 +2,7 @@ import { User, count, db, eq, like } from 'astro:db';
 
 export type UserRecord = typeof User.$inferSelect;
 export type CreateUserRecord = typeof User.$inferInsert & {
+  id: string;
   image?: string | null;
   isAdmin?: boolean;
 };
@@ -56,14 +57,25 @@ export async function getUserByEmail(
 export const createOrUpdateUser = async (
   userData: CreateUserRecord,
 ): Promise<UserRecord> => {
-  const result = await db
-    .insert(User)
-    .values(userData)
-    .onConflictDoUpdate({
-      target: [User.email],
-      set: { ...userData },
-    })
-    .returning();
+  // Find user by email
+  const existingUser = await getUserByEmail(userData.email);
+  if (existingUser) {
+    // Only update if name or image has changed
+    const needsUpdate =
+      existingUser.name !== userData.name ||
+      existingUser.image !== userData.image;
+    if (needsUpdate) {
+      const result = await db
+        .update(User)
+        .set({ name: userData.name, image: userData.image } as UserRecord) // Only update allowed fields
+        .where(eq(User.id, existingUser.id))
+        .returning();
+      return result[0] as UserRecord;
+    }
+    return existingUser;
+  }
+  // Create new user
+  const result = await db.insert(User).values(userData).returning();
   return result[0] as UserRecord;
 };
 

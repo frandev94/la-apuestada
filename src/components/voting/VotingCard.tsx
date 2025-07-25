@@ -26,7 +26,7 @@ export function VotingCard({ combat }: VotingCardProps) {
       <CombatHeader combatId={combat.id} />
       <ErrorDisplay error={error} />
 
-      <div className="flex gap-0 items-center">
+      <div className="flex gap-0 flex--top">
         <div className="w-1/3">
           <FighterContainer
             fighterData={fighter1Data}

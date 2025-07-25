@@ -7,7 +7,7 @@ export function VoteResultDisplay({ votingState }: VoteResultDisplayProps) {
   return (
     <div className="mt-4 p-3 bg-white/10 backdrop-blur-sm rounded-lg text-center border border-white/20">
       <p className="text-sm text-gray-200">
-        You voted for{' '}
+        Votaste por{' '}
         <strong className="text-white">{votingState.userVotedFor}</strong>
       </p>
     </div>

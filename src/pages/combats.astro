@@ -1,9 +1,20 @@
 ---
-import { CombatsDisplay } from '../components/CombatsDisplay';
+import { getVotesPerCombat } from '@/lib/db/vote-repository';
+import { getAllCombatWinners } from '@/lib/db/winner-repository';
+import { getUserFromRequest } from '@/lib/session';
+import { getVotesByUser } from '@/lib/voting';
+import { CombatsDisplay } from '../components/combats';
 import Layout from '../layouts/Layout.astro';
+
+const user = await getUserFromRequest(Astro.request);
+const isAdmin = user?.isAdmin || false;
+
+const winners = await getAllCombatWinners();
+const userVotes = user ? await getVotesByUser(user.id) : [];
+const votesPerCombat = await getVotesPerCombat();
 ---
 
-<Layout title="Combats - La Apuestada">
+<Layout title="Combates - La Apuestada">
   <main
     class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-8"
   >
@@ -13,20 +24,26 @@ import Layout from '../layouts/Layout.astro';
           class="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 p-8 mb-8"
         >
           <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
-            🥊 Combat Arena
+            🥊 Resultados Épicos
           </h1>
           <p class="text-xl text-gray-200 max-w-2xl mx-auto">
-            Witness the most epic battles of La Velada del Año. Follow every
-            fight and discover who will emerge victorious!
+            ¡Bienvenido a la arena donde los puñetazos vuelan y los egos se
+            rompen!<br />
+            Aquí los luchadores se juegan la dignidad... vosotros solo un par de
+            eurillos y el orgullo. <br />
+            Consulta los resultados, presume de tus aciertos o échale la culpa a
+            los jueces si no acertaste.
           </p>
         </div>
       </div>
 
-      <div
-        class="bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 p-6"
-      >
-        <CombatsDisplay client:load />
-      </div>
+      <CombatsDisplay
+        client:load
+        adminMode={isAdmin}
+        winners={winners}
+        userVotes={userVotes}
+        votesPerCombat={votesPerCombat}
+      />
     </div>
   </main>
 </Layout>

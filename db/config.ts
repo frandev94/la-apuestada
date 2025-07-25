@@ -9,7 +9,7 @@ import { NOW, column, defineDb, defineTable } from 'astro:db';
 
 const User = defineTable({
   columns: {
-    id: column.text({ primaryKey: true, default: crypto.randomUUID() }), //
+    id: column.text({ primaryKey: true, unique: true }), //
     email: column.text({ unique: true }),
     name: column.text(),
     image: column.text({ optional: true }),
@@ -24,7 +24,7 @@ const User = defineTable({
 
 const Vote = defineTable({
   columns: {
-    id: column.text({ default: crypto.randomUUID() }),
+    id: column.text({ primaryKey: true, unique: true }),
     userId: column.text({ references: () => User.columns.id }), // The user who voted
     participantId: column.text(), // The participant being voted for
     combatId: column.number(), // Optional combat ID if vote is for a specific combat
@@ -37,8 +37,7 @@ const Vote = defineTable({
 
 const CombatWinner = defineTable({
   columns: {
-    id: column.text({ default: crypto.randomUUID() }),
-    combatId: column.number({ unique: true }), // The combat this winner is for
+    combatId: column.number({ primaryKey: true, unique: true }), // The combat this winner is for
     participantId: column.text(), // The participant who won
     createdAt: column.date({ default: NOW }),
   },

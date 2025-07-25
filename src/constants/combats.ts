@@ -5,7 +5,7 @@ export interface Combat {
   fighter1: EventParticipantsName;
   fighter2: EventParticipantsName;
   winner?: EventParticipantsName;
-  year?: string;
+  year: string;
 }
 
 export const laVeladaCombats: Combat[] = [
@@ -17,33 +17,39 @@ export const laVeladaCombats: Combat[] = [
   },
   {
     id: 2,
-    fighter1: 'perxitaa',
-    fighter2: 'gaspi',
+    fighter1: 'alana',
+    fighter2: 'arigeli',
+    year: '2025',
   },
   {
     id: 3,
-    fighter1: 'abby',
-    fighter2: 'roro',
+    fighter1: 'perxitaa',
+    fighter2: 'gaspi',
+    year: '2025',
   },
   {
     id: 4,
-    fighter1: 'andoni',
-    fighter2: 'carlos',
+    fighter1: 'abby',
+    fighter2: 'roro',
+    year: '2025',
   },
   {
     id: 5,
-    fighter1: 'alana',
-    fighter2: 'arigeli',
+    fighter1: 'viruzz',
+    fighter2: 'tomas',
+    year: '2025',
   },
   {
     id: 6,
-    fighter1: 'viruzz',
-    fighter2: 'tomas',
+    fighter1: 'andoni',
+    fighter2: 'carlos',
+    year: '2025',
   },
   {
     id: 7,
     fighter1: 'grefg',
     fighter2: 'westcol',
+    year: '2025',
   },
 ];
 

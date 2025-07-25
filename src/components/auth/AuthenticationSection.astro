@@ -1,6 +1,6 @@
 ---
 import type { Session } from '@auth/core/types';
-import { SignIn, SignOut } from 'auth-astro/components';
+import { SignOut } from 'auth-astro/components';
 import DiscordButton from './DiscordButton.astro';
 
 export interface Props {
@@ -10,29 +10,24 @@ export interface Props {
 const { session } = Astro.props;
 ---
 
-<div class="hidden md:flex items-center space-x-4">
+<div class="md:flex items-center space-x-4">
   {
     session ? (
       // Authenticated User
       <div class="flex items-center space-x-3">
-        {session.user?.image && (
-          <img
-            src={session.user.image}
-            alt="Profile"
-            class="w-8 h-8 rounded-full border border-white/20"
-          />
-        )}
-        <div class="flex flex-col">
-          <span class="text-sm font-medium text-white">
-            {session.user?.name}
-          </span>
-          <span class="text-xs text-gray-300">Discord User</span>
-        </div>
-        <a
-          href="/profile"
-          class="px-3 py-1 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-        >
-          Profile
+        <a href="/profile" class="flex items-center space-x-3 group">
+          {session.user?.image && (
+            <img
+              src={session.user.image}
+              alt="Profile"
+              class="w-8 h-8 rounded-full border border-white/20 group-hover:ring-2 group-hover:ring-purple-400 transition"
+            />
+          )}
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-white group-hover:underline">
+              {session.user?.name}
+            </span>
+          </div>
         </a>
         <SignOut class="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
           Sign Out
