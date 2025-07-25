@@ -21,8 +21,9 @@ const usersRanked = usersWithVotes
       )?.participantId;
       if (winner && vote.participantId === winner) correct++;
     }
-    return { ...user, correct, total, image };
+    return { ...user, correct, total, image, votesCount: votes.length };
   })
+  .filter((u) => u.votesCount > 0)
   .sort((a, b) => b.correct - a.correct || b.total - a.total);
 
 const maxCorrect = usersRanked.length > 0 ? usersRanked[0].correct : 0;
