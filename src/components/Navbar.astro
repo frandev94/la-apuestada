@@ -1,5 +1,6 @@
 ---
 import { getSession } from 'auth-astro/server';
+import { DiscordButton } from './auth';
 import AuthenticationSection from './auth/AuthenticationSection.astro';
 
 interface Props {
@@ -12,9 +13,24 @@ const { currentPath = '' } = Astro.props;
 const session = await getSession(Astro.request);
 
 const navItems = [
-  { href: '/', label: 'Home', icon: '🏠' },
-  { href: '/combats', label: 'Combats', icon: '🥊' },
-  { href: '/voting', label: 'Voting', icon: '🗳️' },
+  {
+    href: '/combats',
+    label: 'Combates',
+    icon: '🥊',
+    color: 'from-red-600 to-red-700',
+  },
+  {
+    href: '/voting',
+    label: 'Apuestas',
+    icon: '🎯',
+    color: 'from-blue-500 to-indigo-500',
+  },
+  {
+    href: '/ranking',
+    label: 'Ranking',
+    icon: '🏆',
+    color: 'from-yellow-500 to-orange-500',
+  },
 ];
 
 const isActive = (href: string) => {
@@ -24,32 +40,38 @@ const isActive = (href: string) => {
 };
 ---
 
-<nav class="bg-white shadow-lg border-b border-gray-200">
+<nav
+  class="bg-gradient-to-r from-purple-900/95 via-blue-900/95 to-indigo-900/95 backdrop-blur-md shadow-2xl border-b border-white/20"
+>
   <div class="container mx-auto px-4">
     <div class="flex justify-between items-center h-16">
       <!-- Logo/Brand -->
       <div class="flex-shrink-0">
         <a href="/" class="flex items-center space-x-2">
           <span class="text-2xl">🏆</span>
-          <span class="text-xl font-bold text-gray-800">La Apuestada</span>
+          <span class="text-xl font-bold text-white">La Apuestada</span>
         </a>
       </div>
 
       <!-- Navigation Links (Desktop) -->
       <div class="hidden md:block">
-        <div class="ml-10 flex items-baseline space-x-4">
+        <div class="ml-10 flex items-baseline space-x-2">
           {
             navItems.map((item) => (
               <a
                 href={item.href}
-                class={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center space-x-1 ${
-                  isActive(item.href)
-                    ? "bg-indigo-100 text-indigo-700 border-b-2 border-indigo-500"
-                    : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50"
-                }`}
+                class={`px-2 py-2 rounded-md font-medium transition-colors duration-200 flex items-center space-x-1 bg-gradient-to-r ${item.color} \
+                  text-xs md:text-sm \
+                  ${
+                    isActive(item.href)
+                      ? "text-white border-b-2 border-purple-900 shadow-xl hover:scale-105"
+                      : "text-gray-200 hover:text-white hover:bg-white/10"
+                  }`}
               >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
+                <span class="text-lg md:text-xl hidden lg:block">
+                  {item.icon}
+                </span>
+                <span class="hidden sm:inline">{item.label}</span>
               </a>
             ))
           }
@@ -57,13 +79,16 @@ const isActive = (href: string) => {
       </div>
 
       <!-- Authentication Section (Desktop) -->
-      <AuthenticationSection {session} />
+      <div class="hidden md:block">
+        <AuthenticationSection {session} />
+      </div>
 
       <!-- Mobile menu button -->
       <div class="md:hidden">
         <button
           type="button"
-          class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+          id="mobile-menu-button"
+          class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-400"
           aria-controls="mobile-menu"
           aria-expanded="false"
         >
@@ -102,18 +127,18 @@ const isActive = (href: string) => {
   </div>
 
   <!-- Mobile menu (hidden by default) -->
-  <div class="mobile-menu hidden md:hidden">
+  <div id="mobile-menu" class="mobile-menu hidden md:hidden">
     <div
-      class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 border-t border-gray-200"
+      class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-black/20 backdrop-blur-md border-t border-white/20"
     >
       {
         navItems.map((item) => (
           <a
             href={item.href}
-            class={`flex px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 items-center space-x-2 ${
+            class={`flex px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 items-center space-x-2 bg-gradient-to-r hover:scale-x-95 ${item.color} ${
               isActive(item.href)
-                ? "bg-indigo-100 text-indigo-700 border-l-4 border-indigo-500"
-                : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50"
+                ? "text-white border-l-4 border-purple-400 shadow-xl "
+                : "text-gray-200 hover:text-white hover:bg-white/10"
             }`}
           >
             <span>{item.icon}</span>
@@ -121,106 +146,46 @@ const isActive = (href: string) => {
           </a>
         ))
       }
-      
+
       <!-- Mobile Authentication Section -->
-      <div class="border-t border-gray-200 pt-3 mt-3">
-        {session ? (
-          <!-- Authenticated User (Mobile) -->
-          <div class="px-3 py-2 space-y-2">
-            <div class="flex items-center space-x-3">
-              {session.user?.image && (
-                <img 
-                  src={session.user.image} 
-                  alt="Profile" 
-                  class="w-8 h-8 rounded-full border border-gray-300"
-                />
-              )}
-              <div>
-                <p class="text-sm font-medium text-gray-700">{session.user?.name}</p>
-                <p class="text-xs text-gray-500">Discord User</p>
-              </div>
+      <div class="border-t border-white/20 pt-3 mt-3">
+        {
+          session ? (
+            // <!-- Authenticated User (Mobile) -->
+            <AuthenticationSection session={session} />
+          ) : (
+            // <!-- Not authenticated (Mobile) -->
+            <div class="px-3 py-2">
+              <DiscordButton full />
             </div>
-            <div class="space-y-2">
-              <a
-                href="/profile"
-                class="block w-full text-center px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-              >
-                Profile
-              </a>
-              <button
-                id="mobile-signout"
-                class="block w-full text-center px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        ) : (
-          <!-- Not authenticated (Mobile) -->
-          <div class="px-3 py-2">
-            <a
-              href="/auth/discord-login"
-              class="flex items-center justify-center space-x-2 w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-            >
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419-.0001 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1568 2.4189Z"/>
-              </svg>
-              <span>Login with Discord</span>
-            </a>
-          </div>
-        )}
+          )
+        }
       </div>
     </div>
   </div>
 </nav>
 
 <script>
-  // Mobile menu toggle functionality
-  document.addEventListener("DOMContentLoaded", () => {
-    const mobileMenuButton = document.querySelector(".mobile-menu-button");
-    const mobileMenu = document.querySelector(".mobile-menu");
-    const menuIcons = mobileMenuButton?.querySelectorAll("svg");
+  function setupNavbar() {
+    // Mobile menu toggle
+    const menuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
 
-    mobileMenuButton?.addEventListener("click", () => {
-      const isExpanded =
-        mobileMenuButton.getAttribute("aria-expanded") === "true";
+    if (menuButton && mobileMenu) {
+      menuButton.onclick = () => {
+        const isOpen = !mobileMenu.classList.contains("hidden");
+        mobileMenu.classList.toggle("hidden");
+        menuButton.setAttribute("aria-expanded", (!isOpen).toString());
 
-      // Toggle menu visibility
-      mobileMenu?.classList.toggle("hidden");
-
-      // Update button state
-      mobileMenuButton.setAttribute("aria-expanded", (!isExpanded).toString());
-
-      // Toggle icons
-      menuIcons?.forEach((icon, index) => {
-        if (index === 0) {
-          // Menu icon
-          icon.classList.toggle("hidden", !isExpanded);
-          icon.classList.toggle("block", isExpanded);
-        } else {
-          // Close icon
-          icon.classList.toggle("hidden", isExpanded);
-          icon.classList.toggle("block", !isExpanded);
-        }
-      });
-    });
-
-    // Sign out functionality
-    const desktopSignout = document.getElementById("desktop-signout");
-    const mobileSignout = document.getElementById("mobile-signout");
-
-    async function handleSignout() {
-      try {
-        const { signOut } = await import("auth-astro/client");
-        await signOut();
-      } catch (error) {
-        console.error("Sign out error:", error);
-      }
+        // Toggle icons
+        const [menuIcon, closeIcon] = menuButton.querySelectorAll("svg");
+        menuIcon.classList.toggle("hidden", !isOpen);
+        closeIcon.classList.toggle("hidden", isOpen);
+      };
     }
-
-    desktopSignout?.addEventListener("click", handleSignout);
-    mobileSignout?.addEventListener("click", handleSignout);
-  });
+  }
+  // Re-initialize on Astro navigation
+  document.addEventListener("astro:page-load", setupNavbar);
 </script>
 
 <style>

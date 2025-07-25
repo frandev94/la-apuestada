@@ -32,12 +32,12 @@ export function VotingResults() {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          Voting Results
+          Resultados de la votación
         </h2>
         <div className="text-center text-gray-500">
-          <p className="text-lg">No votes yet</p>
+          <p className="text-lg">Aún no hay votos</p>
           <p className="text-sm mt-2">
-            Be the first to vote for your favorite participant!
+            ¡Sé el primero en votar por tu participante favorito!
           </p>
         </div>
       </div>
@@ -48,10 +48,10 @@ export function VotingResults() {
     <div className={'bg-white rounded-lg shadow-md p-6'}>
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          Voting Results
+          Resultados de la votación
         </h2>
         <p className="text-gray-600">
-          Total Votes: <span className="font-semibold">{totalVotes}</span>
+          Votos totales: <span className="font-semibold">{totalVotes}</span>
         </p>
       </div>
 
@@ -80,7 +80,7 @@ export function VotingResults() {
                   {result.voteCount}
                 </span>
                 <span className="text-gray-600 ml-1">
-                  {result.voteCount === 1 ? 'vote' : 'votes'}
+                  {result.voteCount === 1 ? 'voto' : 'votos'}
                 </span>
               </div>
             </div>{' '}
@@ -104,7 +104,7 @@ export function VotingResults() {
       </div>
 
       <div className="mt-6 text-center text-sm text-gray-500">
-        <p>Results update in real-time</p>
+        <p>Resultados actualizados en tiempo real</p>
       </div>
     </div>
   );

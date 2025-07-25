@@ -16,10 +16,11 @@ export async function createVote(voteInput: VoteInput): Promise<VoteRecord> {
   const result = await db
     .insert(Vote)
     .values({
+      id: crypto.randomUUID(),
       userId: voteInput.userId,
       participantId: voteInput.participantId,
       combatId: voteInput.combatId,
-    })
+    } as VoteInput)
     .returning();
 
   return result[0] as VoteRecord;
@@ -220,4 +221,50 @@ export async function getCombatResults(combatId: number): Promise<{
     results,
     totalVotes: totalResult[0]?.total || 0,
   };
+}
+
+/**
+ * Gets all votes for a specific user
+ */
+export async function getVotesByUser(userId: string): Promise<VoteRecord[]> {
+  const result = await db.select().from(Vote).where(eq(Vote.userId, userId));
+  return result as VoteRecord[];
+}
+
+/**
+ * Gets the count of votes per match, grouped by combat and participant
+ */
+export async function getVotesPerCombat(): Promise<
+  Array<{
+    combatId: number;
+    votes: Array<{ participantId: string; voteCount: number }>;
+  }>
+> {
+  // Get all votes grouped by combatId and participantId
+  const result = await db
+    .select({
+      combatId: Vote.combatId,
+      participantId: Vote.participantId,
+      voteCount: count(),
+    })
+    .from(Vote)
+    .groupBy(Vote.combatId, Vote.participantId);
+
+  // Group by combatId
+  const grouped: Record<
+    number,
+    { participantId: string; voteCount: number }[]
+  > = {};
+  for (const row of result) {
+    if (!grouped[row.combatId]) grouped[row.combatId] = [];
+    grouped[row.combatId].push({
+      participantId: row.participantId,
+      voteCount: row.voteCount,
+    });
+  }
+
+  return Object.entries(grouped).map(([combatId, votes]) => ({
+    combatId: Number(combatId),
+    votes,
+  }));
 }

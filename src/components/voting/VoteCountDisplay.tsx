@@ -10,7 +10,7 @@ export function VoteCountDisplay({
       <span className={`text-xl font-semibold ${theme.voteCountColor}`}>
         {voteCount}
       </span>
-      <span className="text-gray-600 ml-1 text-sm">
+      <span className="text-gray-300 ml-1 text-sm">
         {voteCount === 1 ? 'vote' : 'votes'}
       </span>
     </div>

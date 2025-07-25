@@ -4,8 +4,7 @@ export interface Combat {
   id: number;
   fighter1: EventParticipantsName;
   fighter2: EventParticipantsName;
-  winner?: EventParticipantsName;
-  year?: string;
+  year: string;
 }
 
 export const laVeladaCombats: Combat[] = [
@@ -17,33 +16,39 @@ export const laVeladaCombats: Combat[] = [
   },
   {
     id: 2,
-    fighter1: 'perxitaa',
-    fighter2: 'gaspi',
+    fighter1: 'alana',
+    fighter2: 'arigeli',
+    year: '2025',
   },
   {
     id: 3,
-    fighter1: 'abby',
-    fighter2: 'roro',
+    fighter1: 'perxitaa',
+    fighter2: 'gaspi',
+    year: '2025',
   },
   {
     id: 4,
-    fighter1: 'andoni',
-    fighter2: 'carlos',
+    fighter1: 'abby',
+    fighter2: 'roro',
+    year: '2025',
   },
   {
     id: 5,
-    fighter1: 'alana',
-    fighter2: 'arigeli',
+    fighter1: 'viruzz',
+    fighter2: 'tomas',
+    year: '2025',
   },
   {
     id: 6,
-    fighter1: 'viruzz',
-    fighter2: 'tomas',
+    fighter1: 'andoni',
+    fighter2: 'carlos',
+    year: '2025',
   },
   {
     id: 7,
     fighter1: 'grefg',
     fighter2: 'westcol',
+    year: '2025',
   },
 ];
 
@@ -65,20 +70,6 @@ export function getCombatsByFighter(fighterName: string): Combat[] {
 }
 
 /**
- * Get all scheduled combats
- */
-export function getScheduledCombats(): Combat[] {
-  return laVeladaCombats.filter((combat) => combat.winner == null);
-}
-
-/**
- * Get all finished combats
- */
-export function getFinishedCombats(): Combat[] {
-  return laVeladaCombats.filter((combat) => combat.winner != null);
-}
-
-/**
  * Get the opponent of a given fighter in their combat
  */
 export function getOpponent(fighterName: string): string | null {
@@ -86,22 +77,6 @@ export function getOpponent(fighterName: string): string | null {
   if (!combat) return null;
 
   return combat.fighter1 === fighterName ? combat.fighter2 : combat.fighter1;
-}
-
-/**
- * Update combat result
- */
-export function updateCombatResult(combatId: number, winner: string): boolean {
-  const combat = getCombatById(combatId);
-  if (!combat) return false;
-
-  // Validate that winner is one of the fighters
-  if (winner !== combat.fighter1 && winner !== combat.fighter2) {
-    return false;
-  }
-
-  combat.winner = winner;
-  return true;
 }
 
 /**

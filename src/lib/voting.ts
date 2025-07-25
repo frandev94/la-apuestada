@@ -3,8 +3,10 @@ import {
   type EventParticipantsName,
   laVeladaParticipants,
 } from '../constants/participants';
+import * as userRepository from './db/user-repository';
 import * as voteRepository from './db/vote-repository';
 import type { VoteInput, VoteRecord } from './db/vote-repository';
+import { getWinnerByCombat } from './winners';
 
 export interface VoteResults {
   participantId: EventParticipantsName;
@@ -82,6 +84,12 @@ export async function castVote(vote: VoteInput): Promise<VoteRecord> {
 
   if (!isParticipantInCombat(vote.participantId, vote.combatId)) {
     throw new Error('Participant is not in the specified combat');
+  }
+
+  // Check if there is a winner already
+  const combat = await getWinnerByCombat(vote.combatId);
+  if (combat) {
+    throw new Error('Combat already has a winner');
   }
 
   // Check if user has already voted
@@ -196,4 +204,30 @@ export async function getUserVote(
   combatId: number,
 ): Promise<VoteRecord | null> {
   return await voteRepository.getVoteByUser(userId, combatId);
+}
+
+/**
+ * Gets all votes for a specific user
+ */
+export async function getVotesByUser(userId: string): Promise<VoteRecord[]> {
+  return await voteRepository.getVotesByUser(userId);
+}
+
+export async function getAllVotesPerUser(): Promise<
+  Array<{
+    user: { name: string; image?: string | null; id: string };
+    votes: VoteRecord[];
+  }>
+> {
+  const votes = await voteRepository.getAllVotes();
+  const users = await userRepository.getAllUsers();
+
+  return users.map((user) => ({
+    user: {
+      name: user.name,
+      image: user.image,
+      id: user.id,
+    },
+    votes: votes.filter((vote) => vote.userId === user.id),
+  }));
 }

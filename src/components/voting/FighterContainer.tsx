@@ -8,6 +8,7 @@ export function FighterContainer({
   votingState,
   onVote,
   theme,
+  locked = false,
 }: FighterContainerProps) {
   return (
     <div className="flex-1 text-center">
@@ -18,6 +19,7 @@ export function FighterContainer({
         onVote={onVote}
         theme={theme}
         fighterName={fighterData.fighter.name}
+        disabled={locked}
       />
     </div>
   );

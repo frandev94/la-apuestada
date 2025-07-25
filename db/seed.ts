@@ -10,11 +10,15 @@ const { DEFAULT_USER_PASSWORD } = loadEnv(
 );
 
 type UserType = typeof User.$inferSelect;
-type CreateUserType = typeof User.$inferInsert & { isAdmin?: boolean };
+type CreateUserType = typeof User.$inferInsert & {
+  id: string;
+  isAdmin?: boolean;
+};
 type VoteType = typeof Vote.$inferSelect;
 
 // https://astro.build/db/seed
 export default async function seed() {
+  console.log('Seeding database...');
   await generateUsers();
   await generateVotes();
 }
@@ -28,6 +32,7 @@ async function generateUsers() {
   // Create seed users with proper schema
   const users: CreateUserType[] = [
     {
+      id: generateUUID(),
       email: 'fcoj.glez94@gmail.com',
       name: 'Wargios',
       isAdmin: true,

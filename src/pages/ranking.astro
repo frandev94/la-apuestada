@@ -1,0 +1,94 @@
+---
+import PerfectLegendBanner from '@/components/PerfectLegendBanner.astro';
+import RankingUserCard from '@/components/RankingUserCard.astro';
+import { laVeladaCombats } from '@/constants/combats';
+import Layout from '@/layouts/Layout.astro';
+import { getAllVotesPerUser } from '@/lib/voting';
+import { getAllWinners } from '@/lib/winners';
+
+const usersWithVotes = await getAllVotesPerUser(); // users with their votes
+const winners = await getAllWinners(); // combat winners
+
+const usersRanked = usersWithVotes
+  .map(({ user, votes }) => {
+    let correct = 0;
+    const total = laVeladaCombats.length;
+    const image =
+      user.image ?? `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`;
+    for (const vote of votes) {
+      const winner = winners.find(
+        (w) => w.combatId === vote.combatId,
+      )?.participantId;
+      if (winner && vote.participantId === winner) correct++;
+    }
+    return { ...user, correct, total, image, votesCount: votes.length };
+  })
+  .filter((u) => u.votesCount > 0)
+  .sort((a, b) => b.correct - a.correct || b.total - a.total);
+
+const maxCorrect = usersRanked.length > 0 ? usersRanked[0].correct : 0;
+const perfectLegends = usersRanked.filter(
+  (u) => u.correct === u.total && u.total > 0,
+);
+---
+
+<Layout>
+  <main
+    class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"
+  >
+    <PerfectLegendBanner perfectLegends={perfectLegends} />
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h1
+        class="text-4xl md:text-6xl font-bold text-white mb-10 text-center tracking-tight"
+      >
+        <span
+          class="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"
+        >
+          Ranking de Leyendas
+        </span>
+      </h1>
+      <p
+        class="text-lg md:text-xl text-gray-300 mb-12 text-center max-w-2xl mx-auto"
+      >
+        ¿Cuántas predicciones acertaste? ¡Mide tu sabiduría y presume tu gloria!
+      </p>
+      <div class="space-y-6">
+        {
+          usersRanked.length === 0 && (
+            <div class="text-center text-gray-400">
+              No hay votos registrados aún.
+            </div>
+          )
+        }
+        {
+          usersRanked.map((user, idx) => {
+            const percent =
+              user.total > 0 ? (user.correct / user.total) * 100 : 0;
+            const isWinner = user.correct === maxCorrect && maxCorrect > 0;
+            return (
+              <RankingUserCard
+                user={user}
+                idx={idx}
+                percent={percent}
+                isWinner={isWinner}
+              />
+            );
+          })
+        }
+      </div>
+    </div>
+  </main>
+</Layout>
+<style>
+  @keyframes gold-shine {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: 0 0;
+    }
+  }
+  .animate-gold-shine {
+    animation: gold-shine 2.5s linear infinite;
+  }
+</style>

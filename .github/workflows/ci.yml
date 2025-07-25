@@ -5,8 +5,6 @@ env:
   ASTRO_DB_REMOTE_URL: file:./db/local.db
 
 on:
-  push:
-    branches: [ main, dev ]
   pull_request:
     branches: [ main, dev ]
 

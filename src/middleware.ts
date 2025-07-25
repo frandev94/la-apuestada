@@ -1,6 +1,7 @@
 import { defineMiddleware, sequence } from 'astro:middleware';
-import type { Session, User } from '@auth/core/types';
+import type { Session } from '@auth/core/types';
 import { getSession } from 'auth-astro/server';
+import { generateUUID } from './lib/crypto';
 import { createOrUpdateUser, getUserByEmail } from './lib/db/user-repository';
 
 const authCookieName = 'la_apuestada_auth';
@@ -36,8 +37,21 @@ const authCookieMiddleware = defineMiddleware(
           expires: session.expires ? new Date(session.expires) : undefined,
         });
         // create user if needed
-        if (session?.user?.email && session?.user?.name)
-          await createUserIfNeeded(session.user);
+        if (session?.user?.email && session?.user?.name) {
+          const { email, image, name } = session.user;
+          await createOrUpdateUser({
+            id: generateUUID(),
+            email,
+            image,
+            name,
+          }).catch((error) => {
+            console.error(
+              'Error creating or updating user:',
+              { email, image, name },
+              error,
+            );
+          });
+        }
       }
       return next();
     }
@@ -71,6 +85,34 @@ const adminProtectionMiddleware = defineMiddleware(
   },
 );
 
+const corsMiddleware = defineMiddleware(async ({ request }, next) => {
+  if (request.method === 'OPTIONS') {
+    const headers = new Headers();
+    headers.append('Access-Control-Allow-Origin', '*');
+    headers.append('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+    headers.append(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept',
+    );
+    return new Response(null, { headers });
+  }
+
+  const response = await next();
+
+  const headers = new Headers(response.headers);
+  headers.append('Access-Control-Allow-Origin', '*');
+  headers.append('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  headers.append(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept',
+  );
+
+  return new Response(response.body, {
+    ...response,
+    headers: headers,
+  });
+});
+
 /**
  * Combined middleware to handle session and authentication cookie management.
  */
@@ -78,24 +120,6 @@ const sessionAndAuthMiddleware = sequence(
   sessionMiddleware,
   authCookieMiddleware,
 );
-
-/**
- *
- */
-const createUserIfNeeded = async ({ email, image, name }: User) => {
-  try {
-    if (!email || !name) return;
-    const upsertUser = await createOrUpdateUser({ email, name, image });
-    if (upsertUser.id) {
-      console.log('User created or updated:', upsertUser.id);
-    } else {
-      throw new Error('User creation or update failed');
-    }
-    return upsertUser;
-  } catch (error) {
-    throw new Error(`Error creating or updating user: ${error}`);
-  }
-};
 
 export const onRequest = sequence(
   sessionAndAuthMiddleware,

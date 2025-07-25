@@ -1,0 +1,79 @@
+---
+// PerfectLegendBanner.astro
+// Banner animado para mostrar los usuarios con "Leyenda perfecta"
+interface Props {
+  perfectLegends: Array<{
+    name: string;
+  }>;
+}
+
+const { perfectLegends = [] } = Astro.props;
+if (perfectLegends.length <= 0) return null;
+---
+
+<div
+  id="perfect-legend-banner"
+  class="relative flex flex-col items-center justify-center mb-0 cursor-pointer group"
+  title="Haz clic para cerrar"
+>
+  <div class="absolute inset-0 pointer-events-none z-10 animate-confetti">
+    <style>
+      @keyframes confetti {
+        0% {
+          transform: translateY(-100vh) rotateZ(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh) rotateZ(360deg);
+          opacity: 0;
+        }
+      }
+      .confetti-piece {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+        opacity: 0.8;
+        animation: confetti 2.5s linear infinite;
+      }
+    </style>
+    {
+      [...Array(24)].map(() => (
+        <div
+          class="confetti-piece"
+          style={`left: ${Math.random() * 100}%; background: hsl(${Math.random() * 360},90%,60%); animation-delay: ${Math.random() * 2}s;`}
+        />
+      ))
+    }
+  </div>
+  <div
+    class="relative z-20 px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-300 via-pink-400 to-orange-400 shadow-2xl border-4 border-white/40 flex flex-col items-center animate-bounce group-hover:scale-95 transition-transform"
+  >
+    <span
+      class="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg flex items-center gap-2"
+    >
+      🏆 ¡Leyenda perfecta{perfectLegends.length > 1 ? "s" : ""}! 🏆
+    </span>
+    <span class="text-lg text-white font-semibold mt-1">
+      {perfectLegends.map((u) => u.name).join(", ")}
+    </span>
+    <span class="text-base text-white/80">
+      ¡Acert{perfectLegends.length > 1 ? "aron" : "ó"} todas las predicciones!
+    </span>
+    <span class="text-xs text-white/60 mt-1">(Haz clic para cerrar)</span>
+  </div>
+</div>
+
+<script>
+  const loadEvent = () => {
+    const banner = document.getElementById("perfect-legend-banner");
+    console.log("Perfect Legend Banner loaded", banner);
+    if (banner) {
+      banner.addEventListener("click", () => {
+        banner.style.display = "none";
+        console.log("Perfect Legend Banner closed");
+      });
+    }
+  };
+  document.addEventListener("astro:page-load", loadEvent);
+</script>

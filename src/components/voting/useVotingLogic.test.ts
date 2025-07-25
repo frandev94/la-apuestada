@@ -29,6 +29,7 @@ const mockCombat: Combat = {
   id: 1,
   fighter1: 'peereira',
   fighter2: 'rivaldios',
+  year: '2025',
 };
 
 let getVoteStateReturn: { data: { participantId: string | null } };
