@@ -1,6 +1,7 @@
 ---
 import PerfectLegendBanner from '@/components/PerfectLegendBanner.astro';
 import RankingUserCard from '@/components/RankingUserCard.astro';
+import { laVeladaCombats } from '@/constants/combats';
 import Layout from '@/layouts/Layout.astro';
 import { getAllVotesPerUser } from '@/lib/voting';
 import { getAllWinners } from '@/lib/winners';
@@ -11,7 +12,7 @@ const winners = await getAllWinners(); // combat winners
 const usersRanked = usersWithVotes
   .map(({ user, votes }) => {
     let correct = 0;
-    const total = votes.length;
+    const total = laVeladaCombats.length;
     const image =
       user.image ?? `https://api.dicebear.com/7.x/bottts/svg?seed=${user.name}`;
     for (const vote of votes) {
