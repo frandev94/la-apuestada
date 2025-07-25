@@ -5,11 +5,13 @@ import { FighterCard } from './FighterCard';
 import { VotesBar } from './VotesBar';
 
 interface CombatCardProps {
-  combat: Combat;
+  combat: Combat & {
+    winner?: EventParticipantsName;
+  };
   adminMode: boolean;
   getParticipantName: (id: string) => string;
-  getStatusBadge: (winner: Combat['winner']) => string;
-  getStatusText: (winner: Combat['winner']) => string;
+  getStatusBadge: (winner?: EventParticipantsName) => string;
+  getStatusText: (winner?: EventParticipantsName) => string;
   handleSetWinner: (combatId: number, winner: EventParticipantsName) => void;
   deleteWinner: (combatId: number) => void;
   userVote: string | null;

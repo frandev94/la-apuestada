@@ -1,11 +1,14 @@
 import type { Combat } from '@/constants/combats';
+import type { EventParticipantsName } from '@/constants/participants';
 
 /**
  * Test fixtures for combats-related components and functionality
  * Centralized test data management for consistent testing
  */
 
-export const mockCombats: Combat[] = [
+export const mockCombats: (Combat & {
+  winner?: EventParticipantsName; // Optional winner field for finished combats
+})[] = [
   {
     id: 1,
     fighter1: 'peereira',

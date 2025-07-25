@@ -2,7 +2,6 @@ import { actions } from 'astro:actions';
 import type { CombatWinnerRecord } from '@/lib/db/winner-repository';
 import { useState } from 'react';
 import { laVeladaCombats } from '../../constants/combats';
-import type { Combat } from '../../constants/combats';
 import type { EventParticipantsName } from '../../constants/participants';
 import { CombatCard } from './CombatCard';
 import { CombatsSummary } from './CombatsSummary';
@@ -25,12 +24,12 @@ export function CombatsDisplay({
   userVotes = [],
   votesPerCombat = [],
 }: CombatsDisplayProps) {
-  // Inicializa los combates con los ganadores del server
   const initialCombats = laVeladaCombats.map((combat) => {
     const found = winners.find((winner) => winner.combatId === combat.id);
-    return found
-      ? { ...combat, winner: found.participantId as EventParticipantsName }
-      : combat;
+    return {
+      ...combat,
+      winner: found?.participantId as EventParticipantsName | undefined,
+    };
   });
   const [combats, setCombats] = useState(initialCombats);
 
@@ -38,7 +37,7 @@ export function CombatsDisplay({
     return participantId.charAt(0).toUpperCase() + participantId.slice(1);
   };
 
-  const getStatusBadge = (winner: Combat['winner']) => {
+  const getStatusBadge = (winner?: EventParticipantsName) => {
     const baseClasses = 'px-2 py-1 rounded-full text-xs font-medium';
 
     if (winner === undefined) {
@@ -47,7 +46,7 @@ export function CombatsDisplay({
     return `${baseClasses} bg-green-500/20 text-green-200 border border-green-400/30`;
   };
 
-  const getStatusText = (winner: Combat['winner']) => {
+  const getStatusText = (winner?: EventParticipantsName) => {
     return winner === undefined ? 'Programado' : 'Finalizado';
   };
 
