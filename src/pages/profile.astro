@@ -3,7 +3,6 @@ import { SignOutButton } from '@/components/auth';
 import { getUserAndSessionFromRequest } from '@/lib/session';
 import { getVotesByUser } from '@/lib/voting';
 import { getAllWinners } from '@/lib/winners';
-import { getSession } from 'auth-astro/server';
 import Layout from '../layouts/Layout.astro';
 
 const { user, session } = await getUserAndSessionFromRequest(Astro.request);
