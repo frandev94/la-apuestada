@@ -85,6 +85,10 @@ const adminProtectionMiddleware = defineMiddleware(
   },
 );
 
+/**
+ * CORS middleware for handling cross-origin requests
+ * Currently not used but available for future API endpoints
+ */
 const corsMiddleware = defineMiddleware(async ({ request }, next) => {
   if (request.method === 'OPTIONS') {
     const headers = new Headers();

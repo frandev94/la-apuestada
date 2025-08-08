@@ -29,3 +29,6 @@ coverage/
 .vercel
 
 db/*.db
+
+# Demo files for testing/demonstration
+demo/

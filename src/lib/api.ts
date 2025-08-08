@@ -1,4 +1,5 @@
 import type { ApiResponse, PaginationMeta, User } from './api.d';
+import { cleanText, validateUserName } from './content-validation';
 
 /**
  * Create a success API response
@@ -122,16 +123,68 @@ export function validateRequired<T>(params: Record<string, T>): string[] {
 
 /**
  * Sanitize user object by returning only allowed User fields
+ * Also validates and cleans user name to prevent inappropriate content
  */
 export function sanitizeUser(user: User) {
+  const sanitizedName = user.name ? cleanText(user.name) : user.name;
+
   return {
     id: user.id,
-    name: user.name,
+    name: sanitizedName,
     email: user.email,
     image: user.image ?? null,
     isAdmin: user.isAdmin ?? false,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+  };
+}
+
+/**
+ * Enhanced validation for user data including content validation
+ */
+export function validateUserData(userData: {
+  name?: string;
+  email?: string;
+  [key: string]: unknown;
+}): {
+  isValid: boolean;
+  errors: string[];
+  sanitizedData: typeof userData;
+} {
+  const errors: string[] = [];
+  const sanitizedData = { ...userData };
+
+  // Validate required fields
+  const missingFields = validateRequired({
+    name: userData.name,
+    email: userData.email,
+  });
+
+  if (missingFields.length > 0) {
+    errors.push(`Campos requeridos faltantes: ${missingFields.join(', ')}`);
+  }
+
+  // Validate name content if provided
+  if (userData.name) {
+    const nameValidation = validateUserName(userData.name);
+    if (!nameValidation.isValid) {
+      errors.push(nameValidation.error || 'Nombre inválido');
+    }
+    sanitizedData.name = nameValidation.sanitizedName;
+  }
+
+  // Basic email validation
+  if (userData.email && typeof userData.email === 'string') {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userData.email)) {
+      errors.push('Formato de email inválido');
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    sanitizedData,
   };
 }
 
