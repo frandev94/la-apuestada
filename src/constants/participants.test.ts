@@ -24,13 +24,15 @@ describe('Participants Module', () => {
         'tomas',
         'grefg',
         'westcol',
+        'pablo',
+        'elena',
       ];
 
       expect(laVeladaParticipants).toEqual(expectedParticipants);
     });
 
-    test('should have 14 participants', () => {
-      expect(laVeladaParticipants).toHaveLength(14);
+    test('should have 16 participants', () => {
+      expect(laVeladaParticipants).toHaveLength(16);
     });
 
     test('should contain only unique participants', () => {
@@ -132,7 +134,7 @@ describe('Participants Module', () => {
   describe('Integration Tests', () => {
     test('laVeladaParticipants should pass validation with correct count', () => {
       expect(() =>
-        validateParticipantsList(laVeladaParticipants, 14),
+        validateParticipantsList(laVeladaParticipants, 16),
       ).not.toThrow();
     });
 

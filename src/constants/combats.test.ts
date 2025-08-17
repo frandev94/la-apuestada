@@ -19,8 +19,8 @@ describe('Combats Module', () => {
   });
 
   describe('laVeladaCombats', () => {
-    test('should contain 7 combats', () => {
-      expect(laVeladaCombats).toHaveLength(7);
+    test('should contain 8 combats', () => {
+      expect(laVeladaCombats).toHaveLength(8);
     });
 
     test('should have all expected combats', () => {
@@ -33,6 +33,7 @@ describe('Combats Module', () => {
         { fighter1: 'alana', fighter2: 'arigeli' },
         { fighter1: 'viruzz', fighter2: 'tomas' },
         { fighter1: 'grefg', fighter2: 'westcol' },
+        { fighter1: 'pablo', fighter2: 'elena' },
       ];
 
       for (const expected of expectedCombats) {
@@ -51,11 +52,11 @@ describe('Combats Module', () => {
       expect(uniqueIds.size).toBe(ids.length);
     });
 
-    test('should have sequential IDs from 1 to 7', () => {
+    test('should have sequential IDs from 1 to 8', () => {
       const ids = laVeladaCombats
         .map((combat) => combat.id)
         .sort((a, b) => a - b);
-      expect(ids).toEqual([1, 2, 3, 4, 5, 6, 7]);
+      expect(ids).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     });
 
     test('each fighter should appear exactly once', () => {
@@ -135,7 +136,7 @@ describe('Combats Module', () => {
 
   describe('getTotalCombats', () => {
     test('should return correct total number of combats', () => {
-      expect(getTotalCombats()).toBe(7);
+      expect(getTotalCombats()).toBe(8);
     });
   });
 

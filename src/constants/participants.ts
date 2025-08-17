@@ -13,6 +13,8 @@ export const laVeladaParticipants: EventParticipantsName[] = [
   'tomas',
   'grefg',
   'westcol',
+  'pablo',
+  'elena',
 ];
 
 export type EventParticipantsName =
@@ -29,7 +31,9 @@ export type EventParticipantsName =
   | 'viruzz'
   | 'tomas'
   | 'grefg'
-  | 'westcol';
+  | 'westcol'
+  | 'pablo'
+  | 'elena';
 
 export const generateFighterAvatarUrl = (
   fighterId: EventParticipantsName,

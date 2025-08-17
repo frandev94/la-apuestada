@@ -50,6 +50,12 @@ export const laVeladaCombats: Combat[] = [
     fighter2: 'westcol',
     year: '2025',
   },
+  {
+    id: 8,
+    fighter1: 'pablo',
+    fighter2: 'elena',
+    year: '2025',
+  },
 ];
 
 /**
