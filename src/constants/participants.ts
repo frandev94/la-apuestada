@@ -24,12 +24,36 @@ export const laVeladaParticipants: string[] =
 
 export type EventParticipantsName = (typeof laVeladaParticipants)[number];
 
+// Maps normalized fighter ids to the slug used by cdn.infolavelada.com
+// (sourced from https://www.infolavelada.com/pronosticos on 2026-07-25).
+const FIGHTER_CDN_SLUGS: Record<EventParticipantsName, string> = {
+  laparce: 'la-parce',
+  fabianasevillano: 'fabiana-sevillano',
+  clersss: 'clersss',
+  nataliamx: 'natalia-mx',
+  eduaguirre: 'edu-aguirre',
+  gastonedul: 'gaston-edul',
+  martadiaz: 'marta-diaz',
+  tatianakaer: 'tatiana-kaer',
+  viruzz: 'viruzz',
+  geroarias: 'gero-arias',
+  alondrissa: 'alondrissa',
+  angievelasco: 'angie-velasco',
+  litkillah: 'lit-killah',
+  kiddkeo: 'kidd-keo',
+  samyrivers: 'samy-rivers',
+  roro: 'roro',
+  plex: 'plex',
+  fernanfloo: 'fernanfloo',
+  illojuan: 'illojuan',
+  thegrefg: 'thegrefg',
+};
+
 export const generateFighterAvatarUrl = (
   fighterId: EventParticipantsName,
-  size: 'big' | 'cards' = 'cards',
 ): string => {
-  const path = `https://www.infolavelada.com/images/fighters/${size}/${fighterId}.webp`;
-  return path;
+  const slug = FIGHTER_CDN_SLUGS[fighterId] ?? fighterId;
+  return `https://cdn.infolavelada.com/character-hero/${slug}.webp`;
 };
 
 // Function to validate the participants list
