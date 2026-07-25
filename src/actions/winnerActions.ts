@@ -1,5 +1,4 @@
-import { defineAction } from 'astro:actions';
-import { z } from 'astro:schema';
+import { ActionError, defineAction } from 'astro:actions';
 import type { EventParticipantsName } from '@/constants/participants';
 import {
   clearAllCombatWinners,
@@ -8,7 +7,7 @@ import {
   upsertCombatWinner,
 } from '@/lib/db/winner-repository';
 import { getUserFromRequest } from '@/lib/session';
-import { ActionError } from 'astro/actions/runtime/virtual/shared.js';
+import { z } from 'astro/zod';
 
 const winnerActions = {
   setWinner: defineAction({

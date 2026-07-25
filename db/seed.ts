@@ -17,8 +17,10 @@ type CreateUserType = typeof User.$inferInsert & {
 type VoteType = typeof Vote.$inferSelect;
 
 // https://astro.build/db/seed
+import { activeConfig } from '@/config';
+
 export default async function seed() {
-  console.log('Seeding database...');
+  console.log(`Seeding database for ${activeConfig.event}...`);
   await generateUsers();
   await generateVotes();
 }

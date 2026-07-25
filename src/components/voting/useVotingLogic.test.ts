@@ -22,15 +22,10 @@ vi.mock('astro:actions', () => {
 });
 
 import { actions } from 'astro:actions';
-import type { Combat } from '@/constants/combats';
+import { laVeladaCombats } from '@/constants/combats';
 import { useVotingLogic } from './useVotingLogic';
 
-const mockCombat: Combat = {
-  id: 1,
-  fighter1: 'peereira',
-  fighter2: 'rivaldios',
-  year: '2025',
-};
+const mockCombat = laVeladaCombats[0];
 
 let getVoteStateReturn: { data: { participantId: string | null } };
 let originalGetVoteState: typeof actions.voteActions.getVoteState;

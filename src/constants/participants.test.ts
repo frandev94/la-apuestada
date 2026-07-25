@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import { laVeladaCombats } from './combats';
 import { laVeladaParticipants, validateParticipantsList } from './participants';
 
 describe('Participants Module', () => {
@@ -8,29 +9,12 @@ describe('Participants Module', () => {
   });
 
   describe('laVeladaParticipants', () => {
-    test('should contain the expected participants', () => {
-      const expectedParticipants = [
-        'peereira',
-        'rivaldios',
-        'perxitaa',
-        'gaspi',
-        'abby',
-        'roro',
-        'andoni',
-        'carlos',
-        'alana',
-        'arigeli',
-        'viruzz',
-        'tomas',
-        'grefg',
-        'westcol',
-      ];
-
-      expect(laVeladaParticipants).toEqual(expectedParticipants);
+    test('should contain participants based on config', () => {
+      expect(laVeladaParticipants.length).toBeGreaterThan(0);
     });
 
-    test('should have 14 participants', () => {
-      expect(laVeladaParticipants).toHaveLength(14);
+    test('should have correct number of participants', () => {
+      expect(laVeladaParticipants.length).toBe(laVeladaCombats.length * 2);
     });
 
     test('should contain only unique participants', () => {
@@ -132,7 +116,10 @@ describe('Participants Module', () => {
   describe('Integration Tests', () => {
     test('laVeladaParticipants should pass validation with correct count', () => {
       expect(() =>
-        validateParticipantsList(laVeladaParticipants, 14),
+        validateParticipantsList(
+          laVeladaParticipants,
+          laVeladaParticipants.length,
+        ),
       ).not.toThrow();
     });
 

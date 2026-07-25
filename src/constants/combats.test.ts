@@ -19,30 +19,33 @@ describe('Combats Module', () => {
   });
 
   describe('laVeladaCombats', () => {
-    test('should contain 7 combats', () => {
-      expect(laVeladaCombats).toHaveLength(7);
+    test('should contain correct number of combats', () => {
+      expect(laVeladaCombats.length).toBeGreaterThan(0);
     });
 
-    test('should have all expected combats', () => {
-      // Comprobamos que todos los combates esperados existen en laVeladaCombats, sin importar el orden ni la id
-      const expectedCombats = [
-        { fighter1: 'peereira', fighter2: 'rivaldios' },
-        { fighter1: 'perxitaa', fighter2: 'gaspi' },
-        { fighter1: 'abby', fighter2: 'roro' },
-        { fighter1: 'andoni', fighter2: 'carlos' },
-        { fighter1: 'alana', fighter2: 'arigeli' },
-        { fighter1: 'viruzz', fighter2: 'tomas' },
-        { fighter1: 'grefg', fighter2: 'westcol' },
-      ];
-
-      for (const expected of expectedCombats) {
-        const found = laVeladaCombats.find(
-          (c) =>
-            c.fighter1 === expected.fighter1 &&
-            c.fighter2 === expected.fighter2,
-        );
-        expect(found).toBeDefined();
-      }
+    test('should match the published 2026 combat lineup', () => {
+      expect(laVeladaCombats).toEqual([
+        {
+          id: 1,
+          fighter1: 'laparce',
+          fighter2: 'fabianasevillano',
+          year: '2026',
+        },
+        { id: 2, fighter1: 'clersss', fighter2: 'nataliamx', year: '2026' },
+        { id: 3, fighter1: 'eduaguirre', fighter2: 'gastonedul', year: '2026' },
+        { id: 4, fighter1: 'martadiaz', fighter2: 'tatianakaer', year: '2026' },
+        { id: 5, fighter1: 'viruzz', fighter2: 'geroarias', year: '2026' },
+        {
+          id: 6,
+          fighter1: 'alondrissa',
+          fighter2: 'angievelasco',
+          year: '2026',
+        },
+        { id: 7, fighter1: 'litkillah', fighter2: 'kiddkeo', year: '2026' },
+        { id: 8, fighter1: 'samyrivers', fighter2: 'roro', year: '2026' },
+        { id: 9, fighter1: 'plex', fighter2: 'fernanfloo', year: '2026' },
+        { id: 10, fighter1: 'illojuan', fighter2: 'thegrefg', year: '2026' },
+      ]);
     });
 
     test('should have unique combat IDs', () => {
@@ -51,11 +54,12 @@ describe('Combats Module', () => {
       expect(uniqueIds.size).toBe(ids.length);
     });
 
-    test('should have sequential IDs from 1 to 7', () => {
+    test('should have sequential IDs starting from 1', () => {
       const ids = laVeladaCombats
         .map((combat) => combat.id)
         .sort((a, b) => a - b);
-      expect(ids).toEqual([1, 2, 3, 4, 5, 6, 7]);
+      expect(ids[0]).toBe(1);
+      expect(ids[ids.length - 1]).toBe(laVeladaCombats.length);
     });
 
     test('each fighter should appear exactly once', () => {
@@ -83,8 +87,8 @@ describe('Combats Module', () => {
       const combat = getCombatById(1);
       expect(combat).toBeDefined();
       expect(combat?.id).toBe(1);
-      expect(combat?.fighter1).toBe('peereira');
-      expect(combat?.fighter2).toBe('rivaldios');
+      expect(typeof combat?.fighter1).toBe('string');
+      expect(typeof combat?.fighter2).toBe('string');
     });
 
     test('should return undefined for invalid ID', () => {
@@ -96,14 +100,16 @@ describe('Combats Module', () => {
 
   describe('getCombatsByFighter', () => {
     test('should return combat for valid fighter', () => {
-      const combats = getCombatsByFighter('peereira');
+      const firstCombat = laVeladaCombats[0];
+      const combats = getCombatsByFighter(firstCombat.fighter1);
       expect(combats).toHaveLength(1);
-      expect(combats[0].id).toBe(1);
+      expect(combats[0].id).toBe(firstCombat.id);
     });
 
     test('should return combat whether fighter is fighter1 or fighter2', () => {
-      const combat1 = getCombatsByFighter('peereira'); // fighter1
-      const combat2 = getCombatsByFighter('rivaldios'); // fighter2
+      const firstCombat = laVeladaCombats[0];
+      const combat1 = getCombatsByFighter(firstCombat.fighter1);
+      const combat2 = getCombatsByFighter(firstCombat.fighter2);
 
       expect(combat1).toHaveLength(1);
       expect(combat2).toHaveLength(1);
@@ -118,13 +124,15 @@ describe('Combats Module', () => {
 
   describe('getOpponent', () => {
     test('should return correct opponent for fighter1', () => {
-      const opponent = getOpponent('peereira');
-      expect(opponent).toBe('rivaldios');
+      const firstCombat = laVeladaCombats[0];
+      const opponent = getOpponent(firstCombat.fighter1);
+      expect(opponent).toBe(firstCombat.fighter2);
     });
 
     test('should return correct opponent for fighter2', () => {
-      const opponent = getOpponent('rivaldios');
-      expect(opponent).toBe('peereira');
+      const firstCombat = laVeladaCombats[0];
+      const opponent = getOpponent(firstCombat.fighter2);
+      expect(opponent).toBe(firstCombat.fighter1);
     });
 
     test('should return null for non-existent fighter', () => {
@@ -135,7 +143,7 @@ describe('Combats Module', () => {
 
   describe('getTotalCombats', () => {
     test('should return correct total number of combats', () => {
-      expect(getTotalCombats()).toBe(7);
+      expect(getTotalCombats()).toBe(laVeladaCombats.length);
     });
   });
 

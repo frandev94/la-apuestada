@@ -124,4 +124,5 @@ const sessionAndAuthMiddleware = sequence(
 export const onRequest = sequence(
   sessionAndAuthMiddleware,
   adminProtectionMiddleware,
+  corsMiddleware,
 );

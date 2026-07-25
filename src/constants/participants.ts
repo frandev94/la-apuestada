@@ -1,35 +1,28 @@
-export const laVeladaParticipants: EventParticipantsName[] = [
-  'peereira',
-  'rivaldios',
-  'perxitaa',
-  'gaspi',
-  'abby',
-  'roro',
-  'andoni',
-  'carlos',
-  'alana',
-  'arigeli',
-  'viruzz',
-  'tomas',
-  'grefg',
-  'westcol',
-];
+import { activeConfig } from '@/config';
 
-export type EventParticipantsName =
-  | 'peereira'
-  | 'rivaldios'
-  | 'perxitaa'
-  | 'gaspi'
-  | 'abby'
-  | 'roro'
-  | 'andoni'
-  | 'carlos'
-  | 'alana'
-  | 'arigeli'
-  | 'viruzz'
-  | 'tomas'
-  | 'grefg'
-  | 'westcol';
+export function normalizeFighterName(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/\s+/g, '')
+    .replace(/á/g, 'a')
+    .replace(/é/g, 'e')
+    .replace(/í/g, 'i')
+    .replace(/ó/g, 'o')
+    .replace(/ú/g, 'u')
+    .replace(/ñ/g, 'n');
+}
+
+const fighters = activeConfig.combats.flatMap((c) => [
+  c.fighter_1,
+  c.fighter_2,
+]);
+const uniqueFighters = [...new Set(fighters)];
+export const laVeladaParticipants: string[] =
+  uniqueFighters.map(normalizeFighterName);
+
+export type EventParticipantsName = (typeof laVeladaParticipants)[number];
 
 export const generateFighterAvatarUrl = (
   fighterId: EventParticipantsName,

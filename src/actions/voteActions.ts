@@ -1,10 +1,9 @@
-import { defineAction } from 'astro:actions';
-import { z } from 'astro:schema';
+import { ActionError, defineAction } from 'astro:actions';
 import type { EventParticipantsName } from '@/constants/participants';
 import { getVoteByUser } from '@/lib/db/vote-repository';
 import { getUserFromRequest } from '@/lib/session';
 import { castVote, clearVotes } from '@/lib/voting';
-import { ActionError } from 'astro/actions/runtime/virtual/shared.js';
+import { z } from 'astro/zod';
 
 const voteActions = {
   castVote: defineAction({

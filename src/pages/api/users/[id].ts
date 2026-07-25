@@ -1,10 +1,10 @@
-import { z } from 'astro:schema';
 import { createErrorResponse, createSuccessResponse } from '@/lib/api';
 import { getUserById } from '@/lib/db/user-repository';
 import type { APIRoute } from 'astro';
+import { z } from 'astro/zod';
 
 const paramsSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
 });
 
 type GetApiRoute = APIRoute<
@@ -45,7 +45,7 @@ export const GET: GetApiRoute = async ({ params }) => {
     if (error instanceof z.ZodError) {
       return createErrorResponse({
         error: 'Invalid user ID',
-        message: error.errors.map((e) => e.message).join(', '),
+        message: 'Invalid uuid',
         status: 400,
       });
     }

@@ -1,0 +1,18 @@
+{
+  "source": "https://www.infolavelada.com/pronosticos",
+  "backedUpAt": "2026-07-25",
+  "event": "La Velada del Año VI",
+  "year": 2026,
+  "combats": [
+    { "pelea": 1, "fighter_1": "Edu Aguirre", "fighter_2": "Gastón Edul" },
+    { "pelea": 2, "fighter_1": "Fabiana Sevillano", "fighter_2": "La Parce" },
+    { "pelea": 3, "fighter_1": "Clersss", "fighter_2": "NataliaMX" },
+    { "pelea": 4, "fighter_1": "Lit Killah", "fighter_2": "Kidd Keo" },
+    { "pelea": 5, "fighter_1": "Alondrissa", "fighter_2": "Angie Velasco" },
+    { "pelea": 6, "fighter_1": "Gero Arias", "fighter_2": "ByViruzz" },
+    { "pelea": 7, "fighter_1": "Rivers", "fighter_2": "RoRo" },
+    { "pelea": 8, "fighter_1": "Marta Díaz", "fighter_2": "Tatiana Kaer" },
+    { "pelea": 9, "fighter_1": "YoSoyPlex", "fighter_2": "Fernanfloo" },
+    { "pelea": 10, "fighter_1": "IlloJuan", "fighter_2": "TheGrefg" }
+  ]
+}
