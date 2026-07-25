@@ -1,4 +1,3 @@
-import db from '@astrojs/db';
 import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
@@ -11,7 +10,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  integrations: [react(), db(), auth()],
+  integrations: [react(), auth()],
   output: 'server',
   adapter: vercel(),
 });

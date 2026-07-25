@@ -32,8 +32,8 @@ export const mockUserRecords: MockUser[] = [
   {
     id: '1',
     name: 'Alice Smith',
-    createdAt: new Date('2024-01-01T10:00:00Z'),
-    updatedAt: new Date('2024-01-01T10:00:00Z'),
+    createdAt: '2024-01-01T10:00:00Z',
+    updatedAt: '2024-01-01T10:00:00Z',
     email: '',
     image: null,
     isAdmin: false,
@@ -41,8 +41,8 @@ export const mockUserRecords: MockUser[] = [
   {
     id: '2',
     name: 'Bob Johnson',
-    createdAt: new Date('2024-01-02T11:00:00Z'),
-    updatedAt: new Date('2024-01-02T11:00:00Z'),
+    createdAt: '2024-01-02T11:00:00Z',
+    updatedAt: '2024-01-02T11:00:00Z',
     email: '',
     image: null,
     isAdmin: false,
@@ -50,8 +50,8 @@ export const mockUserRecords: MockUser[] = [
   {
     id: generateUUID(),
     name: 'Charlie Brown',
-    createdAt: new Date('2024-01-03T12:00:00Z'),
-    updatedAt: new Date('2024-01-03T12:00:00Z'),
+    createdAt: '2024-01-03T12:00:00Z',
+    updatedAt: '2024-01-03T12:00:00Z',
     email: '',
     image: null,
     isAdmin: false,

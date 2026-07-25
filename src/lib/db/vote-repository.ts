@@ -1,28 +1,31 @@
-import { Vote, and, count, db, eq } from 'astro:db';
-import type { EventParticipantsName } from '../../constants/participants';
+import { and, count, eq } from 'drizzle-orm';
+import { db } from './client';
+import { votesTable } from './schema';
 
-export type VoteInput = typeof Vote.$inferInsert & {
-  participantId: EventParticipantsName;
+export type VoteInput = Omit<
+  typeof votesTable.$inferInsert,
+  'id' | 'createdAt'
+> & {
+  participantId: string;
 };
 
-export type VoteRecord = typeof Vote.$inferSelect & {
-  participantId: EventParticipantsName;
+export type VoteRecord = typeof votesTable.$inferSelect & {
+  participantId: string;
 };
 
 /**
  * Creates a new vote in the database
  */
 export async function createVote(voteInput: VoteInput): Promise<VoteRecord> {
-  const result = await db
-    .insert(Vote)
+  const result = (await db
+    .insert(votesTable)
     .values({
       id: crypto.randomUUID(),
       userId: voteInput.userId,
       participantId: voteInput.participantId,
       combatId: voteInput.combatId,
-    } as VoteInput)
-    .returning();
-
+    })
+    .returning()) as VoteRecord[];
   return result[0] as VoteRecord;
 }
 
@@ -30,8 +33,7 @@ export async function createVote(voteInput: VoteInput): Promise<VoteRecord> {
  * Gets all votes from the database
  */
 export async function getAllVotes(): Promise<VoteRecord[]> {
-  const result = await db.select().from(Vote);
-  return result as VoteRecord[];
+  return (await db.select().from(votesTable)) as VoteRecord[];
 }
 
 /**
@@ -40,11 +42,10 @@ export async function getAllVotes(): Promise<VoteRecord[]> {
 export async function getVotesByCombat(
   combatId: number,
 ): Promise<VoteRecord[]> {
-  const result = await db
+  return (await db
     .select()
-    .from(Vote)
-    .where(eq(Vote.combatId, combatId));
-  return result as VoteRecord[];
+    .from(votesTable)
+    .where(eq(votesTable.combatId, combatId))) as VoteRecord[];
 }
 
 /**
@@ -53,11 +54,10 @@ export async function getVotesByCombat(
 export async function getVotesByParticipant(
   participantId: string,
 ): Promise<VoteRecord[]> {
-  const result = await db
+  return (await db
     .select()
-    .from(Vote)
-    .where(eq(Vote.participantId, participantId));
-  return result as VoteRecord[];
+    .from(votesTable)
+    .where(eq(votesTable.participantId, participantId))) as VoteRecord[];
 }
 
 /**
@@ -67,13 +67,15 @@ export async function getVotesByParticipantAndCombat(
   participantId: string,
   combatId: number,
 ): Promise<VoteRecord[]> {
-  const result = await db
+  return (await db
     .select()
-    .from(Vote)
+    .from(votesTable)
     .where(
-      and(eq(Vote.participantId, participantId), eq(Vote.combatId, combatId)),
-    );
-  return result as VoteRecord[];
+      and(
+        eq(votesTable.participantId, participantId),
+        eq(votesTable.combatId, combatId),
+      ),
+    )) as VoteRecord[];
 }
 
 /**
@@ -83,11 +85,13 @@ export async function getVoteByUser(
   userId: string,
   combatId: number,
 ): Promise<VoteRecord | null> {
-  const result = await db
+  const result = (await db
     .select()
-    .from(Vote)
-    .where(and(eq(Vote.userId, userId), eq(Vote.combatId, combatId)))
-    .limit(1);
+    .from(votesTable)
+    .where(
+      and(eq(votesTable.userId, userId), eq(votesTable.combatId, combatId)),
+    )
+    .limit(1)) as VoteRecord[];
   return result.length > 0 ? (result[0] as VoteRecord) : null;
 }
 
@@ -98,11 +102,13 @@ export async function hasUserVoted(
   userId: string,
   combatId: number,
 ): Promise<boolean> {
-  const vote = await db
+  const vote = (await db
     .select()
-    .from(Vote)
-    .where(and(eq(Vote.userId, userId), eq(Vote.combatId, combatId)))
-    .limit(1);
+    .from(votesTable)
+    .where(
+      and(eq(votesTable.userId, userId), eq(votesTable.combatId, combatId)),
+    )
+    .limit(1)) as VoteRecord[];
   return vote.length > 0;
 }
 
@@ -110,11 +116,13 @@ export async function hasUserVoted(
  * Gets vote count for a specific participant
  */
 export async function getVoteCount(participantId: string): Promise<number> {
-  const result = await db
-    .select({ count: count() })
-    .from(Vote)
-    .where(eq(Vote.participantId, participantId));
-  return result[0]?.count || 0;
+  const result = (await db
+    .select({ total: count() })
+    .from(votesTable)
+    .where(eq(votesTable.participantId, participantId))) as Array<{
+    total: number;
+  }>;
+  return result[0]?.total ?? 0;
 }
 
 /**
@@ -124,21 +132,26 @@ export async function getCombatVoteCount(
   participantId: string,
   combatId: number,
 ): Promise<number> {
-  const result = await db
-    .select({ count: count() })
-    .from(Vote)
+  const result = (await db
+    .select({ total: count() })
+    .from(votesTable)
     .where(
-      and(eq(Vote.participantId, participantId), eq(Vote.combatId, combatId)),
-    );
-  return result[0]?.count || 0;
+      and(
+        eq(votesTable.participantId, participantId),
+        eq(votesTable.combatId, combatId),
+      ),
+    )) as Array<{ total: number }>;
+  return result[0]?.total ?? 0;
 }
 
 /**
  * Gets total number of votes
  */
 export async function getTotalVotes(): Promise<number> {
-  const result = await db.select({ count: count() }).from(Vote);
-  return result[0]?.count || 0;
+  const result = (await db
+    .select({ total: count() })
+    .from(votesTable)) as Array<{ total: number }>;
+  return result[0]?.total ?? 0;
 }
 
 /**
@@ -146,8 +159,8 @@ export async function getTotalVotes(): Promise<number> {
  */
 export async function deleteVote(voteId: string): Promise<boolean> {
   try {
-    await db.delete(Vote).where(eq(Vote.id, voteId));
-    return true;
+    const result = await db.delete(votesTable).where(eq(votesTable.id, voteId));
+    return Number(result.rowsAffected ?? 0) > 0;
   } catch (error) {
     console.error('Error deleting vote:', error);
     return false;
@@ -159,7 +172,7 @@ export async function deleteVote(voteId: string): Promise<boolean> {
  */
 export async function clearAllVotes(): Promise<boolean> {
   try {
-    await db.delete(Vote);
+    await db.delete(votesTable);
     return true;
   } catch (error) {
     console.error('Error clearing votes:', error);
@@ -173,14 +186,17 @@ export async function clearAllVotes(): Promise<boolean> {
 export async function getVoteResults(): Promise<
   Array<{ participantId: string; voteCount: number }>
 > {
-  const result = await db
+  const result = (await db
     .select({
-      participantId: Vote.participantId,
+      participantId: votesTable.participantId,
       voteCount: count(),
     })
-    .from(Vote)
-    .groupBy(Vote.participantId)
-    .orderBy(count());
+    .from(votesTable)
+    .groupBy(votesTable.participantId)
+    .orderBy(count())) as Array<{
+    participantId: string;
+    voteCount: number;
+  }>;
 
   return result.map((row) => ({
     participantId: row.participantId,
@@ -196,20 +212,23 @@ export async function getCombatResults(combatId: number): Promise<{
   results: Array<{ participantId: string; voteCount: number }>;
   totalVotes: number;
 }> {
-  const result = await db
+  const result = (await db
     .select({
-      participantId: Vote.participantId,
+      participantId: votesTable.participantId,
       voteCount: count(),
     })
-    .from(Vote)
-    .where(eq(Vote.combatId, combatId))
-    .groupBy(Vote.participantId)
-    .orderBy(count());
+    .from(votesTable)
+    .where(eq(votesTable.combatId, combatId))
+    .groupBy(votesTable.participantId)
+    .orderBy(count())) as Array<{
+    participantId: string;
+    voteCount: number;
+  }>;
 
-  const totalResult = await db
+  const totalResult = (await db
     .select({ total: count() })
-    .from(Vote)
-    .where(eq(Vote.combatId, combatId));
+    .from(votesTable)
+    .where(eq(votesTable.combatId, combatId))) as Array<{ total: number }>;
 
   const results = result.map((row) => ({
     participantId: row.participantId,
@@ -219,7 +238,7 @@ export async function getCombatResults(combatId: number): Promise<{
   return {
     combatId,
     results,
-    totalVotes: totalResult[0]?.total || 0,
+    totalVotes: totalResult[0]?.total ?? 0,
   };
 }
 
@@ -227,8 +246,10 @@ export async function getCombatResults(combatId: number): Promise<{
  * Gets all votes for a specific user
  */
 export async function getVotesByUser(userId: string): Promise<VoteRecord[]> {
-  const result = await db.select().from(Vote).where(eq(Vote.userId, userId));
-  return result as VoteRecord[];
+  return (await db
+    .select()
+    .from(votesTable)
+    .where(eq(votesTable.userId, userId))) as VoteRecord[];
 }
 
 /**
@@ -240,17 +261,19 @@ export async function getVotesPerCombat(): Promise<
     votes: Array<{ participantId: string; voteCount: number }>;
   }>
 > {
-  // Get all votes grouped by combatId and participantId
-  const result = await db
+  const result = (await db
     .select({
-      combatId: Vote.combatId,
-      participantId: Vote.participantId,
+      combatId: votesTable.combatId,
+      participantId: votesTable.participantId,
       voteCount: count(),
     })
-    .from(Vote)
-    .groupBy(Vote.combatId, Vote.participantId);
+    .from(votesTable)
+    .groupBy(votesTable.combatId, votesTable.participantId)) as Array<{
+    combatId: number;
+    participantId: string;
+    voteCount: number;
+  }>;
 
-  // Group by combatId
   const grouped: Record<
     number,
     { participantId: string; voteCount: number }[]

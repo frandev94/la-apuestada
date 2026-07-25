@@ -1,65 +1,49 @@
 import {
-  type MockDatabase,
   createMockAPIContext,
   mockUsers,
   withSuppressedConsole,
 } from '@/__tests__/utils/test-helpers.ts';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
-
-// Mock astro:db - inline creation to avoid hoisting issues
-vi.mock('astro:db', () => {
-  return {
-    db: {
-      select: vi.fn().mockReturnThis(),
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      insert: vi.fn().mockReturnThis(),
-      update: vi.fn().mockReturnThis(),
-      delete: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
-      offset: vi.fn().mockReturnThis(),
-    },
-    User: { id: 'mock-user-id', name: 'mock-name' },
-    eq: vi.fn(),
-    like: vi.fn(),
-    and: vi.fn(),
-    or: vi.fn(),
-  };
-});
-
-import { User, db, eq, like } from 'astro:db';
 import type { ApiResponse, User as IUser } from '@/lib/api.d';
 import { generateUUID } from '@/lib/crypto.ts';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+
+vi.mock('@/lib/db/user-repository', () => ({
+  getAllUsers: vi.fn(),
+  searchUsersByName: vi.fn(),
+  getUserById: vi.fn(),
+  getUserByEmail: vi.fn(),
+  getTotalUsers: vi.fn(),
+}));
+
+import {
+  getAllUsers,
+  getUserById,
+  searchUsersByName,
+} from '@/lib/db/user-repository';
 import { GET as getUserByIdHandler } from './[id].ts';
 import { GET as getUsersHandler } from './index.ts';
 
-// Type the mocked objects for better autocomplete and type safety
-const mockDb = db as unknown as MockDatabase;
-const mockUser = User;
-const mockEq = eq as ReturnType<typeof vi.fn>;
-const mockLike = like as ReturnType<typeof vi.fn>;
+const mockGetAllUsers = getAllUsers as unknown as ReturnType<typeof vi.fn>;
+const mockSearchUsersByName = searchUsersByName as unknown as ReturnType<
+  typeof vi.fn
+>;
+const mockGetUserById = getUserById as unknown as ReturnType<typeof vi.fn>;
 
 describe('Users API Endpoints', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset the mock chain to return itself for chaining
-    mockDb.select.mockReturnValue(mockDb);
-    mockDb.from.mockReturnValue(mockDb);
-    mockDb.where.mockReturnValue(mockDb);
-    mockDb.limit.mockReturnValue(mockDb);
-    mockDb.offset.mockReturnValue(mockUsers);
-
-    // Mock the like function
-    mockLike.mockReturnValue('like-condition');
+    mockGetAllUsers.mockResolvedValue(mockUsers);
+    mockSearchUsersByName.mockImplementation(async (name: string) =>
+      mockUsers.filter((u) =>
+        u.name.toLowerCase().includes(name.toLowerCase()),
+      ),
+    );
+    mockGetUserById.mockImplementation(
+      async (id: string) => mockUsers.find((u) => u.id === id) ?? null,
+    );
   });
 
   test('should return all users without filters', async () => {
-    // Mock the count query (returns all users for counting)
-    mockDb.from.mockResolvedValueOnce(mockUsers);
-    // Mock the paginated query (returns first 10 users)
-    mockDb.offset.mockResolvedValueOnce(mockUsers);
-
     const request = new Request('http://localhost/api/users');
     const context = createMockAPIContext(request);
     const response = await getUsersHandler(context);
@@ -78,15 +62,6 @@ describe('Users API Endpoints', () => {
 
   describe('GET /api/users', () => {
     test('should filter users by name', async () => {
-      const filteredUsers = mockUsers.filter((user) =>
-        user.name.toLowerCase().includes('alice'),
-      );
-
-      // Mock the count query for filtered results
-      mockDb.where.mockResolvedValueOnce(filteredUsers);
-      // Mock the paginated filtered query
-      mockDb.offset.mockResolvedValueOnce(filteredUsers);
-
       const request = new Request('http://localhost/api/users?name=Alice');
       const context = createMockAPIContext(request);
       const response = await getUsersHandler(context);
@@ -96,20 +71,14 @@ describe('Users API Endpoints', () => {
       expect(response.status).toBe(200);
       expect(success).toBe(true);
       expect(data?.users).toHaveLength(2);
-      expect(data?.users.at(0)).toHaveProperty('name', filteredUsers[0].name);
-      expect(data?.users.at(1)).toHaveProperty('name', filteredUsers[1].name);
+      expect(data?.users.at(0)).toHaveProperty('name', 'Alice Smith');
+      expect(data?.users.at(1)).toHaveProperty('name', 'Alice Brown');
       expect(error).toBeUndefined();
       expect(message).toBeUndefined();
-      expect(mockLike).toHaveBeenCalledWith(mockUser.name, '%alice%');
+      expect(mockSearchUsersByName).toHaveBeenCalledWith('Alice');
     });
 
     test('should apply pagination correctly', async () => {
-      // Mock the count query (returns all users for counting)
-      mockDb.from.mockResolvedValueOnce(mockUsers);
-      // Mock the paginated query (returns first 2 users)
-      const paginatedUsers = mockUsers.slice(0, 2);
-      mockDb.offset.mockResolvedValueOnce(paginatedUsers);
-
       const request = new Request(
         'http://localhost/api/users?limit=2&offset=0',
       );
@@ -126,18 +95,15 @@ describe('Users API Endpoints', () => {
     });
 
     test('should handle database errors', async () => {
-      mockDb.from.mockRejectedValue(new Error('Database error'));
-
+      mockGetAllUsers.mockRejectedValueOnce(new Error('Database error'));
       const request = new Request('http://localhost/api/users');
       const context = createMockAPIContext(request);
 
-      // Suppress console output for this known error test
       const response = await withSuppressedConsole(async () => {
         return await getUsersHandler(context);
       });
 
       const data = await response.json();
-
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
       expect(data.error).toBe('Internal server error');
@@ -147,8 +113,6 @@ describe('Users API Endpoints', () => {
   describe('GET /api/users/[id]', () => {
     test('should return user by ID', async () => {
       const targetUser = mockUsers[0];
-      mockDb.limit.mockResolvedValueOnce([targetUser]);
-
       const context = createMockAPIContext(
         new Request(`http://localhost/api/users/${targetUser.id}`),
         { id: targetUser.id },
@@ -161,12 +125,11 @@ describe('Users API Endpoints', () => {
       expect(data.data?.user.id).toBe(targetUser.id);
       expect(data.data?.user.name).toBe(targetUser.name);
       expect(data.data?.user).not.toHaveProperty('hashed_password');
-      expect(mockEq).toHaveBeenCalledWith(mockUser.id, targetUser.id);
+      expect(mockGetUserById).toHaveBeenCalledWith(targetUser.id);
     });
 
     test('should return 404 when user does not exist', async () => {
-      mockDb.limit.mockResolvedValue([]);
-
+      mockGetUserById.mockResolvedValueOnce(null);
       const context = createMockAPIContext(
         new Request('http://localhost/api/users/999'),
         { id: generateUUID() },
@@ -195,20 +158,17 @@ describe('Users API Endpoints', () => {
     });
 
     test('should handle database errors', async () => {
-      mockDb.limit.mockRejectedValue(new Error('Database error'));
-
+      mockGetUserById.mockRejectedValueOnce(new Error('Database error'));
       const context = createMockAPIContext(
         new Request('http://localhost/api/users/1'),
         { id: generateUUID() },
       );
 
-      // Suppress console output for this known error test
       const response = await withSuppressedConsole(async () => {
         return await getUserByIdHandler(context);
       });
 
       const data = await response.json();
-
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
       expect(data.error).toBe('Internal server error');

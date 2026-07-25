@@ -143,8 +143,8 @@ export const mockUsers: MockUser[] = [
     email: 'alice@example.com',
     image: 'https://example.com/alice.png',
     isAdmin: false,
-    createdAt: new Date('2024-01-01T00:00:00Z'),
-    updatedAt: new Date('2024-01-01T00:00:00Z'),
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   },
   {
     id: generateUUID(),
@@ -152,8 +152,8 @@ export const mockUsers: MockUser[] = [
     email: 'bob@example.com',
     image: 'https://example.com/bob.png',
     isAdmin: true,
-    createdAt: new Date('2024-01-02T00:00:00Z'),
-    updatedAt: new Date('2024-01-02T00:00:00Z'),
+    createdAt: '2024-01-02T00:00:00Z',
+    updatedAt: '2024-01-02T00:00:00Z',
   },
   {
     id: generateUUID(),
@@ -161,8 +161,8 @@ export const mockUsers: MockUser[] = [
     email: 'alice.brown@example.com',
     image: null,
     isAdmin: false,
-    createdAt: new Date('2024-01-03T00:00:00Z'),
-    updatedAt: new Date('2024-01-03T00:00:00Z'),
+    createdAt: '2024-01-03T00:00:00Z',
+    updatedAt: '2024-01-03T00:00:00Z',
   },
 ];
 
@@ -236,8 +236,8 @@ export const createMockUser = (overrides: Partial<MockUser> = {}): MockUser => {
     email: 'test.user@example.com',
     image: null,
     isAdmin: false,
-    createdAt: new Date('2024-01-01T00:00:00Z'),
-    updatedAt: new Date('2024-01-01T00:00:00Z'),
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     ...overrides,
   };
 };

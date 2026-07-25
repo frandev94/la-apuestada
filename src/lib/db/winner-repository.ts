@@ -1,13 +1,14 @@
-import { CombatWinner, db, eq } from 'astro:db';
-import type { EventParticipantsName } from '../../constants/participants';
+import { eq } from 'drizzle-orm';
+import { db } from './client';
+import { combatWinnersTable } from './schema';
 
-export type CombatWinnerInput = typeof CombatWinner.$inferInsert & {
-  combatId: number; // The combat this winner is for
-  winner: EventParticipantsName; // The participant who won the combat
+export type CombatWinnerInput = typeof combatWinnersTable.$inferInsert & {
+  combatId: number;
+  winner: string;
 };
 
-export type CombatWinnerRecord = typeof CombatWinner.$inferSelect & {
-  winner: EventParticipantsName; // The participant who won the combat
+export type CombatWinnerRecord = typeof combatWinnersTable.$inferSelect & {
+  winner: string;
 };
 
 /**
@@ -16,16 +17,14 @@ export type CombatWinnerRecord = typeof CombatWinner.$inferSelect & {
 export async function upsertCombatWinner(
   input: CombatWinnerInput,
 ): Promise<CombatWinnerRecord> {
-  // Insert the new winner
-  const result = await db
-    .insert(CombatWinner)
+  const result = (await db
+    .insert(combatWinnersTable)
     .values({ ...input })
-    // or update if it already exists
     .onConflictDoUpdate({
-      target: [CombatWinner.combatId],
+      target: combatWinnersTable.combatId,
       set: { ...input },
     })
-    .returning();
+    .returning()) as CombatWinnerRecord[];
   if (!result[0]) {
     throw new Error(
       'Failed to upsert combat winner: No result returned from database.',
@@ -40,11 +39,11 @@ export async function upsertCombatWinner(
 export async function getCombatWinner(
   combatId: number,
 ): Promise<CombatWinnerRecord | null> {
-  const result = await db
+  const result = (await db
     .select()
-    .from(CombatWinner)
-    .where(eq(CombatWinner.combatId, combatId))
-    .limit(1);
+    .from(combatWinnersTable)
+    .where(eq(combatWinnersTable.combatId, combatId))
+    .limit(1)) as CombatWinnerRecord[];
   return result.length > 0 ? (result[0] as CombatWinnerRecord) : null;
 }
 
@@ -52,8 +51,7 @@ export async function getCombatWinner(
  * Gets all combat winners
  */
 export async function getAllCombatWinners(): Promise<CombatWinnerRecord[]> {
-  const result = await db.select().from(CombatWinner);
-  return result as CombatWinnerRecord[];
+  return (await db.select().from(combatWinnersTable)) as CombatWinnerRecord[];
 }
 
 /**
@@ -61,8 +59,10 @@ export async function getAllCombatWinners(): Promise<CombatWinnerRecord[]> {
  */
 export async function deleteCombatWinner(combatId: number): Promise<boolean> {
   try {
-    await db.delete(CombatWinner).where(eq(CombatWinner.combatId, combatId));
-    return true;
+    const result = await db
+      .delete(combatWinnersTable)
+      .where(eq(combatWinnersTable.combatId, combatId));
+    return Number(result.rowsAffected ?? 0) > 0;
   } catch (error) {
     console.error('Error deleting combat winner:', error);
     return false;
@@ -74,7 +74,7 @@ export async function deleteCombatWinner(combatId: number): Promise<boolean> {
  */
 export async function clearAllCombatWinners(): Promise<boolean> {
   try {
-    await db.delete(CombatWinner);
+    await db.delete(combatWinnersTable);
     return true;
   } catch (error) {
     console.error('Error clearing combat winners:', error);
