@@ -17,7 +17,7 @@
       "astro.config.mjs",
       ".vscode/**/*"
     ],
-    "ignore": []
+    "ignore": [".vercel/**", "dist/**", "node_modules/**"]
   },
   "formatter": {
     "enabled": true,

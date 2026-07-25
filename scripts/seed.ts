@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { eq } from 'drizzle-orm';
 import { laVeladaCombats } from '../src/constants/combats';
 import { db } from '../src/lib/db/client';
