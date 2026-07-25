@@ -37,11 +37,11 @@ export function FighterCard({
     <div
       className={`${colorClasses} backdrop-blur-sm rounded-lg p-3 mb-2 text-center flex flex-col items-center h-full min-h-[220px] justify-between`}
     >
-      <div className="my-2">
+      <div className="my-2 w-full">
         <img
           src={generateFighterAvatarUrl(participantId)}
           alt={getParticipantName(participantId)}
-          className={`w-24 h-24 rounded-full mx-auto mb-2 object-cover ${ringClass}`}
+          className={`h-max rounded-b-full mx-auto mb-3 object-cover border-2 border-white/20 ${ringClass}`}
           loading="lazy"
         />
         <div className="font-medium text-white">
