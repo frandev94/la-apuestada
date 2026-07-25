@@ -20,39 +20,50 @@ The project follows a clean and organized structure:
 
 ```text
 /
-├── public/          # Static assets (favicon, images, etc.)
+├── public/            # Static assets (favicon, images, etc.)
+├── scripts/           # One-off scripts (seed, etc.)
 ├── src/
-│   ├── assets/      # Project assets (SVGs, images)
-│   ├── components/  # Reusable UI components
-│   ├── data/        # Data models and type definitions
-│   ├── layouts/     # Page layout templates
-│   ├── lib/         # Utility functions and shared logic
-│   ├── pages/       # Application pages and routes
-│   └── styles/      # Global stylesheets
-├── test/            # Test files and test configuration
-└── package.json     # Project dependencies and scripts
+│   ├── assets/        # Project assets (SVGs, images)
+│   ├── components/    # Reusable UI components
+│   ├── config/        # Year-specific combat configs (2025, 2026, …)
+│   ├── constants/     # Shared constants (combats, participants, …)
+│   ├── layouts/       # Page layout templates
+│   ├── lib/           # Utility functions and shared logic
+│   │   └── db/        # Drizzle schema + Turso client + repositories
+│   ├── pages/         # Application pages and routes
+│   └── styles/        # Global stylesheets
+├── drizzle.config.ts  # Drizzle Kit config (Turso dialect)
+└── package.json       # Project dependencies and scripts
 ```
 
 ## 🧞 Commands
 
 All commands are run from the root of the project, from a terminal:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run test`            | Run tests with Vitest                           |
-| `npm run test:coverage`   | Run tests with coverage report                  |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+| Command                   | Action                                                    |
+| :------------------------ | :-------------------------------------------------------- |
+| `npm install`             | Installs dependencies                                     |
+| `npm run dev`             | Starts local dev server at `localhost:4321`               |
+| `npm run build`           | Build your production site to `./dist/`                   |
+| `npm run preview`         | Preview your build locally, before deploying              |
+| `npm run check`           | Astro type / diagnostics check                            |
+| `npm run lint`            | Biome lint (alias of `biome check`)                       |
+| `npm run lint:fix`        | Biome autofix                                             |
+| `npm run test`            | Run tests with Vitest                                     |
+| `npm run test:coverage`   | Run tests with coverage report                            |
+| `npm run db:push`         | Push Drizzle schema to **dev** Turso DB (`.env.dev`)      |
+| `npm run db:push:prod`    | Push Drizzle schema to **prod** Turso DB (`.env.prod`)    |
+| `npm run db:seed`         | Seed demo data into dev Turso DB                          |
+| `npm run db:seed:prod`    | Seed demo data into prod Turso DB                         |
+| `npm run db:studio`       | Open Drizzle Studio against dev Turso DB                  |
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Astro
-- **Database**: Astro DB
-- **Styling**: CSS with modern features + TailwindCSS
+- **Framework**: Astro 7 (SSR via `@astrojs/vercel`)
+- **UI**: React 19 + TailwindCSS 4
+- **Database**: [Turso](https://turso.tech/) (libSQL) via `@libsql/client`
+- **ORM / migrations**: [drizzle-orm](https://orm.drizzle.team/) + `drizzle-kit`
+- **Auth**: `auth-astro` with Discord OAuth
 - **Unit Testing**: Vitest
 - **Code Quality**: Biome (linting & formatting)
 - **Language**: TypeScript
@@ -61,8 +72,16 @@ All commands are run from the root of the project, from a terminal:
 
 1. Clone the repository
 2. Install dependencies: `npm install`
-3. Start the development server: `npm run dev`
-4. Open your browser to `http://localhost:4321`
+3. Copy `.env.example` to `.env.dev` and fill in your Turso dev DB URL + token:
+   ```
+   TURSO_DATABASE_URL=libsql://…
+   TURSO_AUTH_TOKEN=…
+   ```
+   You will also want `AUTH_SECRET`, `AUTH_TRUST_HOST`, `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET` and `DEFAULT_USER_PASSWORD` for full local dev.
+4. Push the schema to your dev DB: `npm run db:push`
+5. (Optional) Seed demo data: `npm run db:seed`
+6. Start the development server: `npm run dev`
+7. Open your browser to `http://localhost:4321`
 
 ## 🧪 Testing
 
@@ -82,7 +101,17 @@ This project includes comprehensive development tools:
 - **Code Quality**: Biome for linting and formatting
 - **Type Safety**: TypeScript with strict configuration
 - **Pre-commit Hooks**: Husky with lint-staged for quality enforcement
-- **Database**: Astro DB with migrations and seeding
+- **Database**: Drizzle ORM against Turso; schema lives in `src/lib/db/schema.ts`, repositories in `src/lib/db/*-repository.ts`, and Drizzle Kit config in `drizzle.config.ts`.
+
+### Environment files
+
+| File           | Purpose                                | Tracked? |
+| -------------- | -------------------------------------- | -------- |
+| `.env.example` | Template for the env files below       | ✅        |
+| `.env.dev`     | Turso dev DB credentials               | ❌ (gitignored via `.env.*`) |
+| `.env.prod`    | Turso prod DB credentials              | ❌ (gitignored via `.env.*`) |
+
+`db:push`, `db:seed` and `db:studio` read from `.env.dev` by default. The `:prod` variants read from `.env.prod` (loaded via `dotenv-cli`).
 
 ## 🥊 About La Velada del Año
 
